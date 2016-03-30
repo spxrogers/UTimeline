@@ -1,21 +1,28 @@
 package net.srogers.utimeline.model;
 
-import android.app.Activity;
-import android.os.Bundle;
+import java.util.Collections;
 
-import net.srogers.utimeline.R;
-
-import java.util.ArrayList;
-import java.util.List;
+import io.realm.RealmList;
+import io.realm.RealmObject;
 
 /**
  * Timeline class to hold logic about as user's personal UTimeline.
  */
-public class Timeline {
-    private List<UTimelineEvent> events;
+public class Timeline extends RealmObject {
+    // instance variables
+    private RealmList<UTimelineEvent> events;
 
+    // constructor
     public Timeline() {
-        events = new ArrayList<>();
+        events = new RealmList<>();
+    }
+
+    // getters and setters
+    public RealmList<UTimelineEvent> getEvents() {
+        return events;
+    }
+    public void setEvents(RealmList<UTimelineEvent> events) {
+        this.events = events;
     }
 
     /**
@@ -29,6 +36,6 @@ public class Timeline {
 
     public void addEvent(UTimelineEvent e) {
         events.add(e);
-//        Collections.sort(events); // auto-update sorted order or nah?
+        Collections.sort(events);
     }
 }
