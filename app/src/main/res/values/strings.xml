@@ -2,4 +2,10 @@
     <string name="app_name">UTimeline</string>
     <string name="app_logo_desc">UTimeline Logo with UTexas image</string>
     <string name="first_event_button">Add First Event</string>
+    <string name="add_event_title">Select Title</string>
+    <string name="date_input_placeholder">Date : </string>
+    <string name="description_input_placeholder">Enter Description</string>
+    <string name="description_input_linenum">5</string>
+    <string name="add_image_button">Add Image</string>
+
 </resources>

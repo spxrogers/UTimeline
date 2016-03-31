@@ -4,17 +4,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import net.srogers.utimeline.model.Timeline;
+import net.srogers.utimeline.model.User;
 
 public class MainActivity extends AppCompatActivity {
 
 
+    private User mUser;
     private Timeline mTimeline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mTimeline = new Timeline();
+        mUser = User.getCurrentUser();
+        mTimeline = mUser.getTimeline();
 
         if (mTimeline.hasEvents()) {
             setContentView(R.layout.activity_main);

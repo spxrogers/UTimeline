@@ -7,7 +7,7 @@ import java.util.List;
 import io.realm.RealmObject;
 
 /**
- * Created by steven on 3/28/16.
+ * Class to represent the event data for UTimeline.
  */
 public class UTimelineEvent extends RealmObject implements Comparable<UTimelineEvent> {
     // instance variables
@@ -15,6 +15,14 @@ public class UTimelineEvent extends RealmObject implements Comparable<UTimelineE
     private String description;
     private Date date;
     private List<UTimelineMedia> media;
+
+    // default no arg constructor to make Java happy
+    public UTimelineEvent() {
+        this.title = "";
+        this.description = "";
+        this.date = null;
+        this.media = null;
+    }
 
     // contructors
     public UTimelineEvent(String title, String description, Date date) {

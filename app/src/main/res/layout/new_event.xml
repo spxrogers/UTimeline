@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <Button
+        android:id="@+id/add_event_title"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:text="@string/add_event_title" />
+
+    <EditText
+        android:background="@drawable/description_background"
+        android:id="@+id/add_event_description"
+        android:gravity="top|left"
+        android:inputType="textMultiLine"
+        android:lines="@string/description_input_linenum"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:minLines="@string/description_input_linenum"
+        android:maxLines="@string/description_input_linenum"
+        android:layout_marginTop="50dp"
+        android:scrollbars="vertical"
+        android:hint="@string/description_input_placeholder" />
+
+    <Button
+        android:id="@+id/date_picker"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/date_input_placeholder"
+        android:onClick="showDatePickerDialog" />
+
+    <ImageView
+        android:id="@+id/add_event_image"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
