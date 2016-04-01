@@ -1,7 +1,10 @@
 package net.srogers.utimeline;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import net.srogers.utimeline.model.Timeline;
 import net.srogers.utimeline.model.User;
@@ -35,5 +38,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setContentView(R.layout.no_event_startup);
         }
+    }
+
+    public void addEvent(View v) {
+        Intent intent = new Intent(this, NewEventActivity.class);
     }
 }
