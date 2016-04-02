@@ -5,18 +5,18 @@ import io.realm.RealmObject;
 import io.realm.annotations.Required;
 
 /**
- * Created by steven on 3/29/16.
+ * User class to represent the UTimeline app user.
  */
 public class User extends RealmObject {
     // realm instance
-    private static Realm realm = Realm.getDefaultInstance();
+    public static Realm realm = Realm.getDefaultInstance();
 
     // instance variables
-    @Required
+    // @Required
     private Timeline timeline;
 
     // constructor / generator
-    private User() {
+    public User() {
         timeline = new Timeline();
     }
 
