@@ -74,17 +74,27 @@ public class NewEventActivity extends AppCompatActivity {
                 showDialog(DATE_DIALOG_ID);
             }
         });
-        setDate();
+        setDateTextView();
 
     }
 
-    private void setDate() {
+    private void setDateTextView() {
         final Calendar c = Calendar.getInstance();
+
+        String m;
+        String d;
+        if(month + 1 < 10)
+            m = "0" + Integer.toString(month + 1);
+        else
+            m = Integer.toString(month + 1);
+        if(day < 10)
+            d = "0" + Integer.toString(day);
+        else
+            d = Integer.toString(day);
 
         mEventDate.setText(new StringBuilder()
                 // Month is 0 based, just add 1
-                .append(year).append(" - ").append(month + 1).append(" - ")
-                .append(day));
+                .append(m).append("-").append(d).append("-").append(year));
     }
 
     @Override
@@ -96,7 +106,7 @@ public class NewEventActivity extends AppCompatActivity {
                         year = y;
                         month = m;
                         day = d;
-                        setDate();
+                        setDateTextView();
                     }
                 }, year, month, day);
         }

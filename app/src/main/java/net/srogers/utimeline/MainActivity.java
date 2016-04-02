@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setContentView(R.layout.no_event_startup);
         }
+        //setContentView(R.layout.no_event_startup);
     }
 
     @Override
@@ -38,9 +39,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setContentView(R.layout.no_event_startup);
         }
+        //setContentView(R.layout.no_event_startup);
     }
 
     public void addEvent(View v) {
         Intent intent = new Intent(this, NewEventActivity.class);
+        startActivity(intent);
     }
 }
