@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 
 /**
@@ -14,7 +15,7 @@ public class UTimelineEvent extends RealmObject implements Comparable<UTimelineE
     private String title;
     private String description;
     private Date date;
-    private List<UTimelineMedia> media;
+    private RealmList<UTimelineMedia> media;
 
     // default no arg constructor to make Java happy
     public UTimelineEvent() {
@@ -29,7 +30,7 @@ public class UTimelineEvent extends RealmObject implements Comparable<UTimelineE
         this.title = title;
         this.description = description;
         this.date = date;
-        media = new ArrayList<>();
+        media = new RealmList<>();
     }
 
     // getters and setters
@@ -54,7 +55,8 @@ public class UTimelineEvent extends RealmObject implements Comparable<UTimelineE
     public List<UTimelineMedia> getMedia() {
         return media;
     }
-    public void setMedia(List<UTimelineMedia> media) {
+
+    public void setMedia(RealmList<UTimelineMedia> media) {
         this.media = media;
     }
 

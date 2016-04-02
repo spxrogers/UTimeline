@@ -9,10 +9,10 @@ import io.realm.annotations.Required;
  */
 public class User extends RealmObject {
     // realm instance
-    private static Realm realm = Realm.getDefaultInstance();
+    public static Realm realm = Realm.getDefaultInstance();
 
     // instance variables
-    @Required
+    // @Required
     private Timeline timeline;
 
     // constructor / generator
