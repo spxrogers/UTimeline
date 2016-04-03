@@ -1,7 +1,5 @@
 package net.srogers.utimeline.model;
 
-import io.realm.RealmObject;
-
 /**
  * Created by steven on 3/28/16.
  */
@@ -10,7 +8,7 @@ import io.realm.RealmObject;
 // will have to look into how we can store files on a droid device
 // and if we need a image/video type distinction on how to display specific media
 
-public class UTimelineMedia extends RealmObject {
+public class UTimelineMedia {
     private String location; // location of file saved on disk
 
     public UTimelineMedia() {

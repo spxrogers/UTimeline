@@ -1,27 +1,26 @@
 package net.srogers.utimeline.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
-
-import io.realm.RealmList;
-import io.realm.RealmObject;
+import java.util.List;
 
 /**
  * Timeline class to hold logic about as user's personal UTimeline.
  */
-public class Timeline extends RealmObject {
+public class Timeline {
     // instance variables
-    private RealmList<UTimelineEvent> events;
+    private List<UTimelineEvent> events;
 
     // constructor
     public Timeline() {
-        events = new RealmList<>();
+        events = new ArrayList<>();
     }
 
     // getters and setters
-    public RealmList<UTimelineEvent> getEvents() {
+    public List<UTimelineEvent> getEvents() {
         return events;
     }
-    public void setEvents(RealmList<UTimelineEvent> events) {
+    public void setEvents(List<UTimelineEvent> events) {
         this.events = events;
     }
 
