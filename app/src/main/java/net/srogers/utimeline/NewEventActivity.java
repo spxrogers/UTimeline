@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,8 +18,10 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -70,11 +73,23 @@ public class NewEventActivity extends AppCompatActivity {
         mEventDate = (TextView) findViewById(R.id.event_date);
         Button setDate = (Button) findViewById(R.id.date_picker);
         setDate.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 showDialog(DATE_DIALOG_ID);
             }
         });
         setDateTextView();
+
+        /*final EditText description = (EditText)findViewById(R.id.add_event_description);
+        description.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(description.getWindowToken(), 0);
+                }
+            }
+        });*/
 
     }
 
