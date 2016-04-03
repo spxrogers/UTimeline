@@ -1,10 +1,7 @@
 package net.srogers.utimeline;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,10 +15,8 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,7 +30,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Activity for creating or editing an event
@@ -108,7 +102,6 @@ public class NewEventActivity extends AppCompatActivity {
             d = Integer.toString(day);
 
         mEventDate.setText(new StringBuilder()
-                // Month is 0 based, just add 1
                 .append(m).append("-").append(d).append("-").append(year));
     }
 
@@ -163,8 +156,8 @@ public class NewEventActivity extends AppCompatActivity {
                 Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-                File destination = new File(Environment.getExternalStorageDirectory(),
-                        System.currentTimeMillis() + ".jpg");
+                File destination = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES), System.currentTimeMillis() + ".jpg");
                 FileOutputStream fo;
                 try {
                     destination.createNewFile();
