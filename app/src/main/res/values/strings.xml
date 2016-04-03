@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">UTimeline</string>
     <string name="app_logo_desc">UTimeline Logo with UTexas image</string>
+    <string name="event_detail_date_text">01/01/2016</string>
+    <string name="event_detail_delete_button_text">Delete</string>
+    <string name="event_detail_description_text">The description entered for a user\'s event goes here</string>
+    <string name="event_detail_edit_button_text">Edit</string>
+    <string name="event_detail_image_description">Cover photo image for a UTimelineEvent</string>
+    <string name="event_detail_title_text">Event Name Here</string>
     <string name="first_event_button">Add First Event</string>
+    <string name="title_activity_detail_view">DetailViewActivity</string>
 </resources>

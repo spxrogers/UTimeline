@@ -45,4 +45,14 @@ public class User extends RealmObject {
         realm.copyToRealmOrUpdate(this);
         realm.commitTransaction();
     }
+
+    /**
+     * Gets the UTimelineEvent currently in "focus"
+     *
+     * @return UTimelineEvent
+     */
+    public UTimelineEvent getCurrentEvent() {
+        //TODO: Add logic to determine actual current event, probably from TimelineActivity
+        return timeline.getEvents().get(0);
+    }
 }

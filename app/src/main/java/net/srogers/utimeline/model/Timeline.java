@@ -38,4 +38,24 @@ public class Timeline extends RealmObject {
         events.add(e);
         Collections.sort(events);
     }
+
+    /**
+     * Deletes the given event if it exists
+     *
+     * @param eventToDelete
+     */
+    public void deleteEvent(UTimelineEvent eventToDelete) {
+        int deleteIndex = 0;
+        boolean foundEventToDelete = false;
+
+        while (deleteIndex < events.size() && !foundEventToDelete) {
+            if (!(events.get(deleteIndex).equals(eventToDelete)))
+                deleteIndex++;
+            else
+                foundEventToDelete = true;
+        }
+
+        if (foundEventToDelete)
+            events.remove(deleteIndex);
+    }
 }

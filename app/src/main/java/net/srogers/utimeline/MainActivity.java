@@ -1,9 +1,11 @@
 package net.srogers.utimeline;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import net.srogers.utimeline.model.Timeline;
+import net.srogers.utimeline.model.UTimelineEvent;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,5 +34,15 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setContentView(R.layout.no_event_startup);
         }
+    }
+
+    /**
+     * Starts the DetailViewActivity event to view a specific event
+     *
+     * @param event
+     */
+    public void viewEventDetail(UTimelineEvent event) {
+        Intent intent = new Intent(this, DetailViewActivity.class);
+        startActivity(intent);
     }
 }

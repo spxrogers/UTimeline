@@ -16,4 +16,8 @@ public class UTimelineMedia extends RealmObject {
     public UTimelineMedia() {
         location = "";
     }
+
+    public String getLocation() {
+        return location;
+    }
 }

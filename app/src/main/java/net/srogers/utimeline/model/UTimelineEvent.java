@@ -52,7 +52,8 @@ public class UTimelineEvent extends RealmObject implements Comparable<UTimelineE
     public void setDate(Date date) {
         this.date = date;
     }
-    public List<UTimelineMedia> getMedia() {
+
+    public RealmList<UTimelineMedia> getMedia() {
         return media;
     }
 
