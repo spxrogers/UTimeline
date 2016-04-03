@@ -4,18 +4,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import io.realm.RealmList;
-import io.realm.RealmObject;
-
 /**
  * Class to represent the event data for UTimeline.
  */
-public class UTimelineEvent extends RealmObject implements Comparable<UTimelineEvent> {
+public class UTimelineEvent implements Comparable<UTimelineEvent> {
     // instance variables
     private String title;
     private String description;
     private Date date;
-    private RealmList<UTimelineMedia> media;
+    private List<UTimelineMedia> media;
 
     // default no arg constructor to make Java happy
     public UTimelineEvent() {
@@ -30,7 +27,7 @@ public class UTimelineEvent extends RealmObject implements Comparable<UTimelineE
         this.title = title;
         this.description = description;
         this.date = date;
-        media = new RealmList<>();
+        media = new ArrayList<>();
     }
 
     // getters and setters
@@ -55,8 +52,7 @@ public class UTimelineEvent extends RealmObject implements Comparable<UTimelineE
     public List<UTimelineMedia> getMedia() {
         return media;
     }
-
-    public void setMedia(RealmList<UTimelineMedia> media) {
+    public void setMedia(List<UTimelineMedia> media) {
         this.media = media;
     }
 
