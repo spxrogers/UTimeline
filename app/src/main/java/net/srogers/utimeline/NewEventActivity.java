@@ -52,6 +52,7 @@ public class NewEventActivity extends AppCompatActivity {
 
     private TextView mEventDate;
     private String mImageLocation;
+    private UTimelineEvent mEvent;
 
     private int year;
     private int month;
@@ -72,6 +73,16 @@ public class NewEventActivity extends AppCompatActivity {
 
         setContentView(R.layout.new_event);
 
+        String index = getIntent().getStringExtra("eventIndex");
+        Log.d(TAG, "In onCreate and index is: " + index);
+        if(index == null) {
+            createNewEvent();
+        } else {
+            editEvent(index);
+        }
+    }
+
+    private void createNewEvent() {
         final Calendar c = Calendar.getInstance();
         year = c.get(Calendar.YEAR);
         month = c.get(Calendar.MONTH);
@@ -87,6 +98,40 @@ public class NewEventActivity extends AppCompatActivity {
         });
 
         setDateTextView();
+    }
+
+    private void editEvent(String index) {
+        /*User user = User.getCurrentUser();
+
+        UTimelineEvent event = user.getEvent(Integer.valueOf(index));
+        Date date = event.getDate();
+        year = date.getYear();
+        month = date.getMonth();
+        day = date.getDay();
+
+        mEventDate = (TextView) findViewById(R.id.event_date);
+        Button setDate = (Button) findViewById(R.id.date_picker);
+        setDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(DATE_DIALOG_ID);
+            }
+        });
+
+        setDateTextView();
+
+        Button titleButton = (Button) findViewById(R.id.add_event_title);
+        titleButton.setText(event.getTitle());
+
+        EditText description = (EditText) findViewById(R.id.add_event_description);
+        description.setText(event.getDescription());
+
+        ImageView picture = (ImageView) findViewById(R.id.add_event_image);
+        String path = event.getMedia().get(0).getLocation();
+        if(path != null)
+            scaleAndSetImage(picture, path);
+
+        mEvent = event;*/
 
     }
 
@@ -202,23 +247,29 @@ public class NewEventActivity extends AppCompatActivity {
                     cursor.moveToFirst();
                     String selectedImagePath = cursor.getString(column_index);
                     Log.d(TAG, "Selected image path: " + selectedImagePath);
-                    Bitmap bm;
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inJustDecodeBounds = true;
-                    BitmapFactory.decodeFile(selectedImagePath, options);
-                    final int REQUIRED_SIZE = 200;
-                    int scale = 1;
-                    while (options.outWidth / scale / 2 >= REQUIRED_SIZE
-                            && options.outHeight / scale / 2 >= REQUIRED_SIZE)
-                        scale *= 2;
-                    options.inSampleSize = scale;
-                    options.inJustDecodeBounds = false;
-                    bm = BitmapFactory.decodeFile(selectedImagePath, options);
-                    ivImage.setImageBitmap(bm);
+
+                    scaleAndSetImage(ivImage, selectedImagePath);
+
                     mImageLocation = selectedImagePath;
                     break;
             }
         }
+    }
+
+    private void scaleAndSetImage(ImageView view, String path) {
+        Bitmap bm;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, options);
+        final int REQUIRED_SIZE = 200;
+        int scale = 1;
+        while (options.outWidth / scale / 2 >= REQUIRED_SIZE
+                && options.outHeight / scale / 2 >= REQUIRED_SIZE)
+            scale *= 2;
+        options.inSampleSize = scale;
+        options.inJustDecodeBounds = false;
+        bm = BitmapFactory.decodeFile(path, options);
+        view.setImageBitmap(bm);
     }
 
     public void saveEvent(View v) {
@@ -232,14 +283,21 @@ public class NewEventActivity extends AppCompatActivity {
         c.set(year, month, day);
         Date date = c.getTime();
 
-        UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);
-        UTimelineMedia media = new UTimelineMedia(mImageLocation);
-        newEvent.addMedia(media);
-
         User user = User.getCurrentUser();
-        user.addEvent(newEvent);
-        user.saveUser();
+        if(mEvent != null) {
+            mEvent.setTitle(titleText);
+            mEvent.setDescription(descriptionText);
+            mEvent.setDate(date);
+            //mEvent.getMedia().get(0).setLocation(mImageLocation);
+        } else {
 
+            UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);
+            UTimelineMedia media = new UTimelineMedia(mImageLocation);
+            newEvent.addMedia(media);
+            user.addEvent(newEvent);
+        }
+
+        user.saveUser();
         finish();
     }
 
