@@ -73,9 +73,9 @@ public class NewEventActivity extends AppCompatActivity {
 
         setContentView(R.layout.new_event);
 
-        String index = getIntent().getStringExtra("eventIndex");
+        int index = getIntent().getIntExtra("eventIndex", -1);
         Log.d(TAG, "In onCreate and index is: " + index);
-        if(index == null) {
+        if(index == -1) {
             createNewEvent();
         } else {
             editEvent(index);
@@ -100,10 +100,10 @@ public class NewEventActivity extends AppCompatActivity {
         setDateTextView();
     }
 
-    private void editEvent(String index) {
-        /*User user = User.getCurrentUser();
+    private void editEvent(int index) {
+        User user = User.getCurrentUser();
 
-        UTimelineEvent event = user.getEvent(Integer.valueOf(index));
+        UTimelineEvent event = user.getEvent(index);
         Date date = event.getDate();
         year = date.getYear();
         month = date.getMonth();
@@ -131,7 +131,7 @@ public class NewEventActivity extends AppCompatActivity {
         if(path != null)
             scaleAndSetImage(picture, path);
 
-        mEvent = event;*/
+        mEvent = event;
 
     }
 
@@ -288,7 +288,7 @@ public class NewEventActivity extends AppCompatActivity {
             mEvent.setTitle(titleText);
             mEvent.setDescription(descriptionText);
             mEvent.setDate(date);
-            //mEvent.getMedia().get(0).setLocation(mImageLocation);
+            mEvent.getMedia().get(0).setLocation(mImageLocation);
         } else {
 
             UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);

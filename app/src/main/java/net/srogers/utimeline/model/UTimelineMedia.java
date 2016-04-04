@@ -22,4 +22,7 @@ public class UTimelineMedia {
     public String getLocation() {
         return this.location;
     }
+    public void setLocation(String location) {
+        this.location = location;
+    }
 }
