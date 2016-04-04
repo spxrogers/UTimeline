@@ -49,8 +49,7 @@ public class MainActivity extends AppCompatActivity {
         theTimeline.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-                // TODO: below line is wrong. I need the DetailActivity not yet merged, "NewEventActivity.class" is a placeholder
-                Intent intent = new Intent(MainActivity.this, NewEventActivity.class);
+                Intent intent = new Intent(MainActivity.this, DetailViewActivity.class);
                 intent.putExtra("eventIndex", position);
                 startActivity(intent);
             }
