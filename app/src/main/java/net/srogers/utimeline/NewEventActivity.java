@@ -1,10 +1,13 @@
 package net.srogers.utimeline;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -31,7 +35,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -39,6 +42,13 @@ import java.util.Date;
  * Activity for creating or editing an event
  */
 public class NewEventActivity extends AppCompatActivity {
+
+    // Storage Permission Constants
+    private static final int REQUEST_EXTERNAL_STORAGE = 4;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
     private TextView mEventDate;
     private String mImageLocation;
@@ -112,6 +122,8 @@ public class NewEventActivity extends AppCompatActivity {
     }
 
     public void selectImage(View v) {
+        verifyStoragePermissions(this);
+
         final CharSequence[] items = { "Take Photo", "Choose from Library", "Cancel" };
         AlertDialog.Builder builder = new AlertDialog.Builder(NewEventActivity.this);
         builder.setTitle("Add Photo!");
@@ -204,7 +216,7 @@ public class NewEventActivity extends AppCompatActivity {
         newEvent.addMedia(media);
 
         User user = User.getCurrentUser();
-        user.getTimeline().addEvent(newEvent);
+        user.addEvent(newEvent);
         user.saveUser();
 
         finish();
@@ -212,5 +224,31 @@ public class NewEventActivity extends AppCompatActivity {
 
     public void cancelCreateEvent(View v) {
         finish();
+    }
+
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "Permissions granted!");
+                } else {
+                    // todo: show toast message?
+                    Log.d(TAG, "Permissions weren't granted.");
+                }
+            }
+        }
     }
 }

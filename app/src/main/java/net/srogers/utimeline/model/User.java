@@ -1,5 +1,8 @@
 package net.srogers.utimeline.model;
 
+import java.util.Collections;
+import java.util.List;
+
 import io.paperdb.Paper;
 
 /**
@@ -29,5 +32,14 @@ public class User {
 
     public void saveUser() {
         Paper.book().write("current_user", this);
+    }
+
+    public List<UTimelineEvent> getEvents() { return timeline.getEvents(); }
+
+    public boolean hasEvents() { return !getEvents().isEmpty(); }
+
+    public void addEvent(UTimelineEvent event) {
+        timeline.getEvents().add(event);
+        Collections.sort(timeline.getEvents());
     }
 }

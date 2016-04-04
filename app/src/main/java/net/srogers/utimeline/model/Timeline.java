@@ -23,18 +23,4 @@ public class Timeline {
     public void setEvents(List<UTimelineEvent> events) {
         this.events = events;
     }
-
-    /**
-     * Checks to see whether this Timeline has any events added to it.
-     *
-     * @return boolean, false if there are no UTimelineEvent(s) in events list, true otherwise
-     */
-    public boolean hasEvents() {
-        return !events.isEmpty();
-    }
-
-    public void addEvent(UTimelineEvent e) {
-        events.add(e);
-        Collections.sort(events);
-    }
 }
