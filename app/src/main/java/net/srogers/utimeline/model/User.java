@@ -34,9 +34,39 @@ public class User {
         Paper.book().write("current_user", this);
     }
 
-    public List<UTimelineEvent> getEvents() { return timeline.getEvents(); }
+    public List<UTimelineEvent> getEvents() {
+        return timeline.getEvents();
+    }
 
-    public boolean hasEvents() { return !getEvents().isEmpty(); }
+    /**
+     * Attemtps to get the event at the index requested
+     *
+     * @param eventIndex
+     * @return UTimeline event, or null if index is invalid
+     */
+    public UTimelineEvent getEvent(int eventIndex) {
+        List<UTimelineEvent> events = timeline.getEvents();
+        if (eventIndex < events.size()) {
+            return timeline.getEvents().get(eventIndex);
+        }
+        return null;
+    }
+
+    /**
+     * Deletes the UTimelineEvent at the given eventIndex
+     *
+     * @param eventIndex
+     */
+    public void deleteEvent(int eventIndex) {
+        List<UTimelineEvent> events = timeline.getEvents();
+        if (eventIndex < events.size()) {
+            events.remove(eventIndex);
+        }
+    }
+
+    public boolean hasEvents() {
+        return !getEvents().isEmpty();
+    }
 
     public void addEvent(UTimelineEvent event) {
         timeline.getEvents().add(event);

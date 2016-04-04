@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -18,6 +19,7 @@ import net.srogers.utimeline.model.UTimelineMedia;
 import net.srogers.utimeline.model.User;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +32,7 @@ public class DetailViewActivity extends AppCompatActivity {
     private User mUser;
     private Timeline mTimeline;
     private UTimelineEvent mUTimelineEvent;
+    private int mEventIndex;
 
     //Event detail views
     private ImageView mEventImage;
@@ -38,6 +41,7 @@ public class DetailViewActivity extends AppCompatActivity {
     private TextView mEventDescription;
 
     public static final int DELETE_DIALOG_ID = 1;
+    private static String TAG = "DetailViewActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +50,26 @@ public class DetailViewActivity extends AppCompatActivity {
         //get user information
         mUser = User.getCurrentUser();
         mTimeline = mUser.getTimeline();
-        mUTimelineEvent = mUser.getCurrentEvent();
+
+        //get the passed in eventIndex
+        Intent getExtra = getIntent();
+        mEventIndex = getExtra.getIntExtra("eventIndex", -1);
+
+        //Attempt to get the event at eventIndex
+        if (mEventIndex != -1) {
+            Log.d(TAG, "Displaying event #: " + mEventIndex);
+            mUTimelineEvent = mUser.getEvent(mEventIndex);
+            if (mUTimelineEvent == null) {
+                Log.d(TAG, "Event index given does not exist in event list.");
+                finish();
+            }
+        } else {
+            Log.d(TAG, "No event number was given to view.");
+            finish();
+        }
+
+        //Set the layout
+        setContentView(R.layout.activity_detail_view);
 
         //get event detail view information
         mEventImage = (ImageView) findViewById(R.id.event_detail_image);
@@ -66,9 +89,9 @@ public class DetailViewActivity extends AppCompatActivity {
 
         editButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //TODO: Somehow let NewEventActivity know it needs to edit the current event
-                //Intent intent = new Intent(this, NewEventActivity.class);
-                //startActivity(intent);
+                Intent intent = new Intent(DetailViewActivity.this, NewEventActivity.class);
+                intent.putExtra("eventIndex", mEventIndex);
+                startActivity(intent);
             }
         });
 
@@ -77,8 +100,6 @@ public class DetailViewActivity extends AppCompatActivity {
                 showDialog(DELETE_DIALOG_ID);
             }
         });
-
-        setContentView(R.layout.activity_detail_view);
     }
 
     @Override
@@ -93,9 +114,9 @@ public class DetailViewActivity extends AppCompatActivity {
                         "Yes",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                //mTimeline.deleteEvent(mUTimelineEvent);
-                                //Intent intent = new Intent(this, TimelineActivity.class);
-                                //startActivity(intent);
+                                mUser.deleteEvent(mEventIndex);
+                                mUser.saveUser();
+                                finish();
                             }
                         });
 
@@ -119,28 +140,44 @@ public class DetailViewActivity extends AppCompatActivity {
     public void updateEventImage() {
         List<UTimelineMedia> media = mUTimelineEvent.getMedia();
         UTimelineMedia eventImage = media.get(0);
-        mEventImage.setImageURI(Uri.fromFile(new File(eventImage.getLocation())));
+        if (eventImage != null) {
+            mEventImage.setImageURI(Uri.fromFile(new File(eventImage.getLocation())));
+        } else {
+            Log.d(TAG, "Event did not have an image to update.");
+        }
     }
 
     /**
      * Updates the event title of the event detail page based on current event
      */
     public void updateEventTitle() {
-        mEventTitle.setText(mUTimelineEvent.getTitle());
+        if (mUTimelineEvent.getTitle() != null) {
+            mEventTitle.setText(mUTimelineEvent.getTitle());
+        } else {
+            Log.d(TAG, "Event did not have Title to update.");
+        }
     }
 
     /**
      * Updates the event description of the event detail page based on current event
      */
     public void updateEventDescription() {
-        mEventDescription.setText(mUTimelineEvent.getDescription());
+        if (mUTimelineEvent.getDescription() != null) {
+            mEventDescription.setText(mUTimelineEvent.getDescription());
+        } else {
+            Log.d(TAG, "Event did not have description to update.");
+        }
     }
 
     /**
      * Updates the event date of the event detail page based on current event
      */
     public void updateEventDate() {
-        mEventDate.setText(mUTimelineEvent.getDate().toString());
+        if (mUTimelineEvent.getDate() != null) {
+            SimpleDateFormat df = new SimpleDateFormat("E dd/MM/yyyy");
+            mEventDate.setText(df.format(mUTimelineEvent.getDate()));
+        } else {
+            Log.d(TAG, "Event did not have date to update.");
+        }
     }
-
 }
