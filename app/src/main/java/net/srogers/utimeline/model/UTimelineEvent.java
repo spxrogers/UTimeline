@@ -55,6 +55,9 @@ public class UTimelineEvent implements Comparable<UTimelineEvent> {
     public void setMedia(List<UTimelineMedia> media) {
         this.media = media;
     }
+    public void addMedia(UTimelineMedia media) {
+        this.media.add(media);
+    }
 
     @Override
     public int compareTo(UTimelineEvent obj) {
