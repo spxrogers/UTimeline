@@ -14,4 +14,5 @@ public class UTimelineMedia {
     public UTimelineMedia() {
         location = "";
     }
+    public UTimelineMedia(String location) { this.location = location; }
 }

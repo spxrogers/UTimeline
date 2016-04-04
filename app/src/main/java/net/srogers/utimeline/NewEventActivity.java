@@ -14,14 +14,16 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import net.srogers.utimeline.model.Timeline;
 import net.srogers.utimeline.model.UTimelineEvent;
+import net.srogers.utimeline.model.UTimelineMedia;
 import net.srogers.utimeline.model.User;
 
 import java.io.ByteArrayOutputStream;
@@ -29,7 +31,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Activity for creating or editing an event
@@ -37,9 +41,8 @@ import java.util.Calendar;
 public class NewEventActivity extends AppCompatActivity {
 
     private User mUser;
-    private Timeline mTimeline;
-    private UTimelineEvent mEvent;
     private TextView mEventDate;
+    private String mImageLocation;
 
     private int year;
     private int month;
@@ -49,6 +52,7 @@ public class NewEventActivity extends AppCompatActivity {
     static final int REQUEST_CAMERA = 1;
     static final int SELECT_FILE = 2;
 
+    private static String TAG = "NewEventActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +61,6 @@ public class NewEventActivity extends AppCompatActivity {
         setContentView(R.layout.new_event);
 
         mUser = User.getCurrentUser();
-        mTimeline = mUser.getTimeline();
 
         final Calendar c = Calendar.getInstance();
         year = c.get(Calendar.YEAR);
@@ -158,6 +161,8 @@ public class NewEventActivity extends AppCompatActivity {
                 thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
                 File destination = new File(Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_PICTURES), System.currentTimeMillis() + ".jpg");
+                Log.d(TAG, "Photo destination Uri: " + destination.toURI().toString());
+                Log.d(TAG, "Photo destination path: " + destination.getAbsolutePath());
                 FileOutputStream fo;
                 try {
                     destination.createNewFile();
@@ -170,8 +175,10 @@ public class NewEventActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 ivImage.setImageBitmap(thumbnail);
+                mImageLocation = destination.toURI().toString();
             } else if (requestCode == SELECT_FILE) {
                 Uri selectedImageUri = data.getData();
+                Log.d(TAG, "Selected image Uri: " + selectedImageUri.toString());
                 String[] projection = {MediaStore.MediaColumns.DATA};
                 CursorLoader cursorLoader = new CursorLoader(this, selectedImageUri, projection, null, null,
                         null);
@@ -179,6 +186,7 @@ public class NewEventActivity extends AppCompatActivity {
                 int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
                 cursor.moveToFirst();
                 String selectedImagePath = cursor.getString(column_index);
+                Log.d(TAG, "Selected image path: " + selectedImagePath);
                 Bitmap bm;
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
@@ -192,8 +200,25 @@ public class NewEventActivity extends AppCompatActivity {
                 options.inJustDecodeBounds = false;
                 bm = BitmapFactory.decodeFile(selectedImagePath, options);
                 ivImage.setImageBitmap(bm);
+                mImageLocation = selectedImageUri.toString();
             }
         }
+    }
+
+    public void saveEvent(View v) {
+        Button titleButton = (Button) findViewById(R.id.add_event_title);
+        String titleText = titleButton.getText().toString();
+        EditText description = (EditText) findViewById(R.id.add_event_description);
+        String descriptionText = description.getText().toString();
+        Date date = new Date(year, month, day);
+        UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);
+
+        UTimelineMedia media = new UTimelineMedia(mImageLocation);
+        newEvent.addMedia(media);
+
+        mUser.getTimeline().addEvent(newEvent);
+
+        finish();
     }
 
     public void cancelCreateEvent(View v) {
