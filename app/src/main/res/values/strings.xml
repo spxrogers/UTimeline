@@ -9,5 +9,8 @@
     <string name="add_image_button">Add Image</string>
     <string name="create_event">Done</string>
     <string name="cancel_event">Cancel</string>
+    <string name="plan_future_button_text">Plan Future</string>
+    <string name="add_new_button_text">Add New Event</string>
+    <string name="view_detail_text"><![CDATA[View Detail >]]></string>
 
 </resources>

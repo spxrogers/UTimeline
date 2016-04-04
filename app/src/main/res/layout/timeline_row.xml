@@ -8,7 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        />
+        android:text="Title placeholder" />
 
     <TextView
         android:id="@+id/row_memo"
@@ -16,6 +16,24 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/row_title"
-        />
+        android:text="Demo placeholder" />
+
+    <TextView
+        android:id="@+id/row_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/row_memo"
+        android:text="Date placeholder" />
+
+    <Button
+        android:id="@+id/view_detail_button"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="@string/view_detail_text"
+        android:onClick="viewDetail"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/row_date"
+        style="?android:attr/borderlessButtonStyle" />
 
 </RelativeLayout>
