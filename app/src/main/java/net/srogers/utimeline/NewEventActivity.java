@@ -40,7 +40,6 @@ import java.util.Date;
  */
 public class NewEventActivity extends AppCompatActivity {
 
-    private User mUser;
     private TextView mEventDate;
     private String mImageLocation;
 
@@ -60,8 +59,6 @@ public class NewEventActivity extends AppCompatActivity {
 
         setContentView(R.layout.new_event);
 
-        mUser = User.getCurrentUser();
-
         final Calendar c = Calendar.getInstance();
         year = c.get(Calendar.YEAR);
         month = c.get(Calendar.MONTH);
@@ -75,18 +72,8 @@ public class NewEventActivity extends AppCompatActivity {
                 showDialog(DATE_DIALOG_ID);
             }
         });
-        setDateTextView();
 
-        /*final EditText description = (EditText)findViewById(R.id.add_event_description);
-        description.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(description.getWindowToken(), 0);
-                }
-            }
-        });*/
+        setDateTextView();
 
     }
 
@@ -216,7 +203,9 @@ public class NewEventActivity extends AppCompatActivity {
         UTimelineMedia media = new UTimelineMedia(mImageLocation);
         newEvent.addMedia(media);
 
-        mUser.getTimeline().addEvent(newEvent);
+        User user = User.getCurrentUser();
+        user.getTimeline().addEvent(newEvent);
+        user.saveUser();
 
         finish();
     }
