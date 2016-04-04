@@ -162,7 +162,7 @@ public class NewEventActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 ivImage.setImageBitmap(thumbnail);
-                mImageLocation = destination.toURI().toString();
+                mImageLocation = destination.getAbsolutePath();
             } else if (requestCode == SELECT_FILE) {
                 Uri selectedImageUri = data.getData();
                 Log.d(TAG, "Selected image Uri: " + selectedImageUri.toString());
@@ -187,7 +187,7 @@ public class NewEventActivity extends AppCompatActivity {
                 options.inJustDecodeBounds = false;
                 bm = BitmapFactory.decodeFile(selectedImagePath, options);
                 ivImage.setImageBitmap(bm);
-                mImageLocation = selectedImageUri.toString();
+                mImageLocation = selectedImagePath;
             }
         }
     }
