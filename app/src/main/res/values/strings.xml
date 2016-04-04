@@ -2,4 +2,5 @@
     <string name="app_name">UTimeline</string>
     <string name="app_logo_desc">UTimeline Logo with UTexas image</string>
     <string name="first_event_button">Add First Event</string>
+    <string name="custom_title">Custom Title</string>
 </resources>
