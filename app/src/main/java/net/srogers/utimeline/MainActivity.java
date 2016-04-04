@@ -8,14 +8,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import net.srogers.utimeline.model.UTimelineEvent;
 import net.srogers.utimeline.model.User;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,15 +46,6 @@ public class MainActivity extends AppCompatActivity {
         final TimelineAdapter adapter = new TimelineAdapter(this, R.layout.timeline_row, listData);
         assert theTimeline != null;
         theTimeline.setAdapter(adapter);
-
-        theTimeline.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-                Intent intent = new Intent(MainActivity.this, DetailViewActivity.class);
-                intent.putExtra("eventIndex", position);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override
@@ -78,6 +70,18 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void addFutureEvent(View view) {
+        // todo: send to plan future list
+    }
+
+    public void viewDetail(View view) {
+        // TODO: below line is wrong. I need the DetailActivity not yet merged, "NewEventActivity.class" is a placeholder
+        int index = (Integer) view.getTag();
+        Intent intent = new Intent(this, NewEventActivity.class);
+        intent.putExtra("eventIndex", index);
+        startActivity(intent);
+    }
+
     private class TimelineAdapter extends ArrayAdapter<UTimelineEvent> {
         private final Context context;
         private final List<UTimelineEvent> values;
@@ -90,15 +94,21 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            final UTimelineEvent event = values.get(position);
+
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View rowView = inflater.inflate(R.layout.timeline_row, parent, false);
             TextView titleView = (TextView) rowView.findViewById(R.id.row_title);
             TextView memoView = (TextView) rowView.findViewById(R.id.row_memo);
+            TextView dateView = (TextView) rowView.findViewById(R.id.row_date);
+            Button detailbutton = (Button) rowView.findViewById(R.id.view_detail_button);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yy");
 
-            final UTimelineEvent event = values.get(position);
             titleView.setText(event.getTitle());
             memoView.setText(event.getDescription());
+            dateView.setText(dateFormat.format(event.getDate()));
+            detailbutton.setTag(position);
 
             return rowView;
         }
