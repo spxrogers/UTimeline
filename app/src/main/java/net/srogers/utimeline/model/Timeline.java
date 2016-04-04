@@ -20,6 +20,7 @@ public class Timeline {
     public List<UTimelineEvent> getEvents() {
         return events;
     }
+
     public void setEvents(List<UTimelineEvent> events) {
         this.events = events;
     }

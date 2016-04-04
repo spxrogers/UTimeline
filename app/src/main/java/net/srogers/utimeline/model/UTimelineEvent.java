@@ -50,12 +50,14 @@ public class UTimelineEvent implements Comparable<UTimelineEvent> {
         this.date = date;
     }
 
-    public RealmList<UTimelineMedia> getMedia() {
+    public List<UTimelineMedia> getMedia() {
         return media;
     }
+
     public void setMedia(List<UTimelineMedia> media) {
         this.media = media;
     }
+
     public void addMedia(UTimelineMedia media) {
         this.media.add(media);
     }

@@ -18,8 +18,8 @@ import net.srogers.utimeline.model.UTimelineMedia;
 import net.srogers.utimeline.model.User;
 
 import java.io.File;
-
-import io.realm.RealmList;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Activity to view the details of a specific event
@@ -117,8 +117,8 @@ public class DetailViewActivity extends AppCompatActivity {
      * Updates the image of the event detail page based on current event
      */
     public void updateEventImage() {
-        RealmList<UTimelineMedia> media = mUTimelineEvent.getMedia();
-        UTimelineMedia eventImage = media.first();
+        List<UTimelineMedia> media = mUTimelineEvent.getMedia();
+        UTimelineMedia eventImage = media.get(0);
         mEventImage.setImageURI(Uri.fromFile(new File(eventImage.getLocation())));
     }
 

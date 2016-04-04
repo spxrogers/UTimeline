@@ -82,11 +82,11 @@ public class NewEventActivity extends AppCompatActivity {
 
         String m;
         String d;
-        if(month + 1 < 10)
+        if (month + 1 < 10)
             m = "0" + Integer.toString(month + 1);
         else
             m = Integer.toString(month + 1);
-        if(day < 10)
+        if (day < 10)
             d = "0" + Integer.toString(day);
         else
             d = Integer.toString(day);
@@ -112,7 +112,7 @@ public class NewEventActivity extends AppCompatActivity {
     }
 
     public void selectImage(View v) {
-        final CharSequence[] items = { "Take Photo", "Choose from Library", "Cancel" };
+        final CharSequence[] items = {"Take Photo", "Choose from Library", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(NewEventActivity.this);
         builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
