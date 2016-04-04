@@ -2,7 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.srogers.utimeline">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
 
     <application
         android:allowBackup="true"
@@ -24,8 +26,7 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
-        <activity
-            android:name=".NewEventActivity"
+        <activity android:name=".NewEventActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden">

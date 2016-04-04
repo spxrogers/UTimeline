@@ -64,8 +64,6 @@ public class UTimelineEvent implements Comparable<UTimelineEvent> {
 
     @Override
     public int compareTo(UTimelineEvent obj) {
-        // todo: check date's compareTo. i suspect they use a lesser to greater date order. we'll likely have
-        // todo cont: to return a negated value to get a greater to lesser ordering (we want most recent events shown most recent)
-        return date.compareTo(obj.getDate());
+        return date.compareTo(obj.getDate()) * -1;
     }
 }
