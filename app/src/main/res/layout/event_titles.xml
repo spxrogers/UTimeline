@@ -8,8 +8,9 @@
         android:id="@+id/custom_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
         android:hint="@string/custom_title"
-        android:textSize="30sp"/>
+        android:inputType="textCapSentences"/>
 
     <ListView
         android:id="@+id/title_list"

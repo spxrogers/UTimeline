@@ -13,13 +13,14 @@
             android:id="@+id/add_event_title"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:text="@string/add_event_title" />
+            android:text="@string/add_event_title"
+            android:onClick="selectTitle"/>
 
         <EditText
             android:background="@drawable/description_background"
             android:id="@+id/add_event_description"
             android:gravity="top|start"
-            android:inputType="textMultiLine"
+            android:inputType="textMultiLine|textCapSentences"
             android:lines="@string/description_input_linenum"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"

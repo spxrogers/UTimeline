@@ -31,7 +31,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -50,6 +49,9 @@ public class NewEventActivity extends AppCompatActivity {
     static final int DATE_DIALOG_ID = 0;
     static final int REQUEST_CAMERA = 1;
     static final int SELECT_FILE = 2;
+    static final int TITLE_REQUEST_CODE = 3;
+
+    public static String TITLE_MESSAGE = "title";
 
     private static String TAG = "NewEventActivity";
 
@@ -78,10 +80,9 @@ public class NewEventActivity extends AppCompatActivity {
     }
 
     private void setDateTextView() {
-        final Calendar c = Calendar.getInstance();
-
         String m;
         String d;
+
         if(month + 1 < 10)
             m = "0" + Integer.toString(month + 1);
         else
@@ -109,6 +110,11 @@ public class NewEventActivity extends AppCompatActivity {
                 }, year, month, day);
         }
         return null;
+    }
+
+    public void selectTitle(View v) {
+        Intent intent = new Intent(this, SelectTitleActivity.class);
+        startActivityForResult(intent, TITLE_REQUEST_CODE);
     }
 
     public void selectImage(View v) {
@@ -140,54 +146,64 @@ public class NewEventActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "In onActivityResult with requestCode " + requestCode + " and resultCode " + resultCode);
         if (resultCode == RESULT_OK) {
-            ImageView ivImage = (ImageView) findViewById(R.id.add_event_image);
-            if (requestCode == REQUEST_CAMERA) {
-                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-                File destination = new File(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES), System.currentTimeMillis() + ".jpg");
-                Log.d(TAG, "Photo destination Uri: " + destination.toURI().toString());
-                Log.d(TAG, "Photo destination path: " + destination.getAbsolutePath());
-                FileOutputStream fo;
-                try {
-                    destination.createNewFile();
-                    fo = new FileOutputStream(destination);
-                    fo.write(bytes.toByteArray());
-                    fo.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                ivImage.setImageBitmap(thumbnail);
-                mImageLocation = destination.getAbsolutePath();
-            } else if (requestCode == SELECT_FILE) {
-                Uri selectedImageUri = data.getData();
-                Log.d(TAG, "Selected image Uri: " + selectedImageUri.toString());
-                String[] projection = {MediaStore.MediaColumns.DATA};
-                CursorLoader cursorLoader = new CursorLoader(this, selectedImageUri, projection, null, null,
-                        null);
-                Cursor cursor = cursorLoader.loadInBackground();
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                cursor.moveToFirst();
-                String selectedImagePath = cursor.getString(column_index);
-                Log.d(TAG, "Selected image path: " + selectedImagePath);
-                Bitmap bm;
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(selectedImagePath, options);
-                final int REQUIRED_SIZE = 200;
-                int scale = 1;
-                while (options.outWidth / scale / 2 >= REQUIRED_SIZE
-                        && options.outHeight / scale / 2 >= REQUIRED_SIZE)
-                    scale *= 2;
-                options.inSampleSize = scale;
-                options.inJustDecodeBounds = false;
-                bm = BitmapFactory.decodeFile(selectedImagePath, options);
-                ivImage.setImageBitmap(bm);
-                mImageLocation = selectedImagePath;
+            switch (requestCode) {
+                case TITLE_REQUEST_CODE :
+                    Button titleButton = (Button) findViewById(R.id.add_event_title);
+                    titleButton.setText(data.getStringExtra(TITLE_MESSAGE));
+                    Log.d(TAG, "Title received: " + data.getStringExtra(TITLE_MESSAGE));
+                    break;
+                case REQUEST_CAMERA :
+                    ImageView ivImage = (ImageView) findViewById(R.id.add_event_image);
+                    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+                    File destination = new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES), System.currentTimeMillis() + ".jpg");
+                    Log.d(TAG, "Photo destination Uri: " + destination.toURI().toString());
+                    Log.d(TAG, "Photo destination path: " + destination.getAbsolutePath());
+                    FileOutputStream fo;
+                    try {
+                        destination.createNewFile();
+                        fo = new FileOutputStream(destination);
+                        fo.write(bytes.toByteArray());
+                        fo.close();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    ivImage.setImageBitmap(thumbnail);
+                    mImageLocation = destination.getAbsolutePath();
+                    break;
+                case SELECT_FILE :
+                    ivImage = (ImageView) findViewById(R.id.add_event_image);
+                    Uri selectedImageUri = data.getData();
+                    Log.d(TAG, "Selected image Uri: " + selectedImageUri.toString());
+                    String[] projection = {MediaStore.MediaColumns.DATA};
+                    CursorLoader cursorLoader = new CursorLoader(this, selectedImageUri, projection, null, null,
+                            null);
+                    Cursor cursor = cursorLoader.loadInBackground();
+                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                    cursor.moveToFirst();
+                    String selectedImagePath = cursor.getString(column_index);
+                    Log.d(TAG, "Selected image path: " + selectedImagePath);
+                    Bitmap bm;
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(selectedImagePath, options);
+                    final int REQUIRED_SIZE = 200;
+                    int scale = 1;
+                    while (options.outWidth / scale / 2 >= REQUIRED_SIZE
+                            && options.outHeight / scale / 2 >= REQUIRED_SIZE)
+                        scale *= 2;
+                    options.inSampleSize = scale;
+                    options.inJustDecodeBounds = false;
+                    bm = BitmapFactory.decodeFile(selectedImagePath, options);
+                    ivImage.setImageBitmap(bm);
+                    mImageLocation = selectedImagePath;
+                    break;
             }
         }
     }
@@ -195,11 +211,15 @@ public class NewEventActivity extends AppCompatActivity {
     public void saveEvent(View v) {
         Button titleButton = (Button) findViewById(R.id.add_event_title);
         String titleText = titleButton.getText().toString();
+
         EditText description = (EditText) findViewById(R.id.add_event_description);
         String descriptionText = description.getText().toString();
-        Date date = new Date(year, month, day);
-        UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);
 
+        Calendar c = Calendar.getInstance();
+        c.set(year, month, day);
+        Date date = c.getTime();
+
+        UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);
         UTimelineMedia media = new UTimelineMedia(mImageLocation);
         newEvent.addMedia(media);
 
