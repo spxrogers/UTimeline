@@ -1,30 +1,17 @@
 package net.srogers.utimeline.model;
 
-import io.realm.Realm;
-import io.realm.RealmObject;
-import io.realm.annotations.Required;
+import io.paperdb.Paper;
 
 /**
  * User class to represent the UTimeline app user.
  */
-public class User extends RealmObject {
-    // realm instance
-    public static Realm realm = Realm.getDefaultInstance();
-
+public class User {
     // instance variables
-    // @Required
     private Timeline timeline;
 
     // constructor / generator
     public User() {
         timeline = new Timeline();
-    }
-
-    private static User generateUser() {
-        realm.beginTransaction();
-        User user = realm.createObject(User.class); // create the new object tied to realm
-        realm.commitTransaction();
-        return user;
     }
 
     // getters and setters
@@ -36,14 +23,12 @@ public class User extends RealmObject {
     }
 
     public static User getCurrentUser() {
-        User user = realm.where(User.class).findFirst();
-        return (user != null) ? user : User.generateUser();
+        User user = Paper.book().read("current_user");
+        return (user != null) ? user : new User();
     }
 
     public void saveUser() {
-        realm.beginTransaction();
-        realm.copyToRealmOrUpdate(this);
-        realm.commitTransaction();
+        Paper.book().write("current_user", this);
     }
 
     /**

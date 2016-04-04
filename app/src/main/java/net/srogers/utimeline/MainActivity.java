@@ -3,22 +3,22 @@ package net.srogers.utimeline;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 
-import net.srogers.utimeline.model.Timeline;
-import net.srogers.utimeline.model.UTimelineEvent;
+import net.srogers.utimeline.model.User;
 
 public class MainActivity extends AppCompatActivity {
 
-
-    private Timeline mTimeline;
+    private static String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mTimeline = new Timeline();
+        Log.d(TAG, "In onCreate");
 
-        if (mTimeline.hasEvents()) {
+        if (User.getCurrentUser().getTimeline().hasEvents()) {
             setContentView(R.layout.activity_main);
         } else {
             setContentView(R.layout.no_event_startup);
@@ -29,20 +29,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (mTimeline.hasEvents()) {
+        Log.d(TAG, "In onResume");
+
+        if (User.getCurrentUser().getTimeline().hasEvents()) {
             setContentView(R.layout.activity_main);
         } else {
             setContentView(R.layout.no_event_startup);
         }
+
     }
 
-    /**
-     * Starts the DetailViewActivity event to view a specific event
-     *
-     * @param event
-     */
-    public void viewEventDetail(UTimelineEvent event) {
-        Intent intent = new Intent(this, DetailViewActivity.class);
+    public void addEvent(View v) {
+        Intent intent = new Intent(this, NewEventActivity.class);
         startActivity(intent);
     }
 }
