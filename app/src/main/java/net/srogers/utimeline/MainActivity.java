@@ -71,7 +71,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addFutureEvent(View view) {
-        // todo: send to plan future list
+        Intent intent = new Intent(this, PlanFutureActivity.class);
+        startActivity(intent);
     }
 
     public void viewDetail(View view) {
