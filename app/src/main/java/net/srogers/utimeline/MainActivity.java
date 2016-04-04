@@ -76,9 +76,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void viewDetail(View view) {
-        // TODO: below line is wrong. I need the DetailActivity not yet merged, "NewEventActivity.class" is a placeholder
         int index = (Integer) view.getTag();
-        Intent intent = new Intent(this, NewEventActivity.class);
+        Intent intent = new Intent(this, DetailViewActivity.class);
         intent.putExtra("eventIndex", index);
         startActivity(intent);
     }

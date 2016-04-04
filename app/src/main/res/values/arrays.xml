@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="event_titles">
-        <item>Event 1</item>
-        <item>Event 2</item>
-        <item>Event 3</item>
-        <item>Event 4</item>
-        <item>Event 5</item>
-        <item>Event 6</item>
-        <item>Event 7</item>
-        <item>Event 8</item>
-        <item>Event 9</item>
-        <item>Event 10</item>
-        <item>Event 11</item>
-        <item>Event 12</item>
+        <item>Got accepted!</item>
+        <item>First Football Game</item>
+        <item>Albino Squirrel Sighting</item>
+        <item>First Orange Tower</item>
+        <item>Failed your First Midterm</item>
+        <item>High-fived Mike Scott</item>
+        <item>First nap on campus</item>
+        <item>Fell asleep in class</item>
+        <item>Wrote and Android app</item>
+        <item>Met my best friend</item>
+        <item>First 6th Street Experience</item>
+        <item>Got lost on campus</item>
+        <item>Rode the bus successfully</item>
     </array>
 </resources>
