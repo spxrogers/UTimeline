@@ -204,7 +204,7 @@ public class NewEventActivity extends AppCompatActivity {
         newEvent.addMedia(media);
 
         User user = User.getCurrentUser();
-        user.getTimeline().addEvent(newEvent);
+        user.addEvent(newEvent);
         user.saveUser();
 
         finish();
