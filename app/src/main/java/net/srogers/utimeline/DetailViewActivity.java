@@ -47,13 +47,18 @@ public class DetailViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //get user information
-        mUser = User.getCurrentUser();
-        mTimeline = mUser.getTimeline();
-
         //get the passed in eventIndex
         Intent getExtra = getIntent();
         mEventIndex = getExtra.getIntExtra("eventIndex", -1);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //get user information
+        mUser = User.getCurrentUser();
+        mTimeline = mUser.getTimeline();
 
         //Attempt to get the event at eventIndex
         if (mEventIndex != -1) {
@@ -140,7 +145,9 @@ public class DetailViewActivity extends AppCompatActivity {
     public void updateEventImage() {
         List<UTimelineMedia> media = mUTimelineEvent.getMedia();
         UTimelineMedia eventImage = media.get(0);
-        if (eventImage != null) {
+        String location = eventImage.getLocation();
+
+        if (location != null && !location.isEmpty()) {
             mEventImage.setImageURI(Uri.fromFile(new File(eventImage.getLocation())));
         } else {
             Log.d(TAG, "Event did not have an image to update.");
@@ -151,8 +158,13 @@ public class DetailViewActivity extends AppCompatActivity {
      * Updates the event title of the event detail page based on current event
      */
     public void updateEventTitle() {
+        String title = mUTimelineEvent.getTitle();
         if (mUTimelineEvent.getTitle() != null) {
-            mEventTitle.setText(mUTimelineEvent.getTitle());
+            if (title != null && !title.isEmpty()) {
+                if (title.length() > 25)
+                    title = title.substring(0, 23) + "...";
+                mEventTitle.setText(title);
+            }
         } else {
             Log.d(TAG, "Event did not have Title to update.");
         }
@@ -174,7 +186,7 @@ public class DetailViewActivity extends AppCompatActivity {
      */
     public void updateEventDate() {
         if (mUTimelineEvent.getDate() != null) {
-            SimpleDateFormat df = new SimpleDateFormat("E dd/MM/yyyy");
+            SimpleDateFormat df = new SimpleDateFormat("E MM/dd/yyyy");
             mEventDate.setText(df.format(mUTimelineEvent.getDate()));
         } else {
             Log.d(TAG, "Event did not have date to update.");

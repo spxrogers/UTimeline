@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -52,7 +53,7 @@ public class NewEventActivity extends AppCompatActivity {
 
     private TextView mEventDate;
     private String mImageLocation;
-    private UTimelineEvent mEvent;
+    private int mEvent;
 
     private int year;
     private int month;
@@ -73,12 +74,12 @@ public class NewEventActivity extends AppCompatActivity {
 
         setContentView(R.layout.new_event);
 
-        int index = getIntent().getIntExtra("eventIndex", -1);
-        Log.d(TAG, "In onCreate and index is: " + index);
-        if(index == -1) {
+        mEvent = getIntent().getIntExtra("eventIndex", -1);
+        Log.d(TAG, "In onCreate and index is: " + mEvent);
+        if (mEvent == -1) {
             createNewEvent();
         } else {
-            editEvent(index);
+            editEvent();
         }
     }
 
@@ -100,14 +101,17 @@ public class NewEventActivity extends AppCompatActivity {
         setDateTextView();
     }
 
-    private void editEvent(int index) {
+    private void editEvent() {
         User user = User.getCurrentUser();
 
-        UTimelineEvent event = user.getEvent(index);
+        UTimelineEvent event = user.getEvent(mEvent);
         Date date = event.getDate();
-        year = date.getYear();
-        month = date.getMonth();
-        day = date.getDay();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+
+        year = cal.get(Calendar.YEAR);
+        month = cal.get(Calendar.MONTH);
+        day = cal.get(Calendar.DAY_OF_MONTH);
 
         mEventDate = (TextView) findViewById(R.id.event_date);
         Button setDate = (Button) findViewById(R.id.date_picker);
@@ -130,9 +134,6 @@ public class NewEventActivity extends AppCompatActivity {
         String path = event.getMedia().get(0).getLocation();
         if(path != null)
             scaleAndSetImage(picture, path);
-
-        mEvent = event;
-
     }
 
     private void setDateTextView() {
@@ -148,8 +149,7 @@ public class NewEventActivity extends AppCompatActivity {
         else
             d = Integer.toString(day);
 
-        mEventDate.setText(new StringBuilder()
-                .append(m).append("-").append(d).append("-").append(year));
+        mEventDate.setText(new StringBuilder().append(m).append("-").append(d).append("-" + Integer.toString(year)));
     }
 
     @Override
@@ -284,11 +284,12 @@ public class NewEventActivity extends AppCompatActivity {
         Date date = c.getTime();
 
         User user = User.getCurrentUser();
-        if(mEvent != null) {
-            mEvent.setTitle(titleText);
-            mEvent.setDescription(descriptionText);
-            mEvent.setDate(date);
-            mEvent.getMedia().get(0).setLocation(mImageLocation);
+        if (mEvent != -1) {
+            UTimelineEvent event = user.getEvent(mEvent);
+            event.setTitle(titleText);
+            event.setDescription(descriptionText);
+            event.setDate(date);
+            event.getMedia().get(0).setLocation(mImageLocation);
         } else {
 
             UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);

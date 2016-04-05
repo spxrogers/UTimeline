@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         final List<UTimelineEvent> listData = mUser.getEvents();
         final TimelineAdapter adapter = new TimelineAdapter(this, R.layout.timeline_row, listData);
         assert theTimeline != null;
-        theTimeline.setAdapter(adapter);
+        theTimeline.setAdapter(adapter);  
     }
 
     @Override
