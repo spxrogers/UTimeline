@@ -2,6 +2,7 @@ package net.srogers.utimeline;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -9,14 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import net.srogers.utimeline.model.UTimelineEvent;
 import net.srogers.utimeline.model.User;
 
-import java.text.SimpleDateFormat;
+import java.io.File;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
     private void configureAndDisplayTimeline() {
         final ListView theTimeline = (ListView) findViewById(R.id.timeline_list);
         final List<UTimelineEvent> listData = mUser.getEvents();
-        final TimelineAdapter adapter = new TimelineAdapter(this, R.layout.timeline_row, listData);
+        final TimelineAdapter adapter = new TimelineAdapter(this, R.layout.timeline_row_left, listData);
         assert theTimeline != null;
-        theTimeline.setAdapter(adapter);  
+        theTimeline.setAdapter(adapter);
     }
 
     @Override
@@ -98,17 +99,23 @@ public class MainActivity extends AppCompatActivity {
 
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View rowView = inflater.inflate(R.layout.timeline_row, parent, false);
+            View rowView = position % 2 == 0 ?
+                    inflater.inflate(R.layout.timeline_row_left, parent, false) :
+                    inflater.inflate(R.layout.timeline_row_right, parent, false);
             TextView titleView = (TextView) rowView.findViewById(R.id.row_title);
-            TextView memoView = (TextView) rowView.findViewById(R.id.row_memo);
-            TextView dateView = (TextView) rowView.findViewById(R.id.row_date);
-            Button detailbutton = (Button) rowView.findViewById(R.id.view_detail_button);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yy");
+            ImageView imageView = (ImageView) rowView.findViewById(R.id.row_thumb);
 
             titleView.setText(event.getTitle());
-            memoView.setText(event.getDescription());
-            dateView.setText(dateFormat.format(event.getDate()));
-            detailbutton.setTag(position);
+            if (event.getMedia().size() > 0) {
+                imageView.setImageURI(Uri.fromFile(new File(event.getMedia().get(0).getLocation())));
+            }
+            imageView.setTag(position);
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewDetail(v);
+                }
+            });
 
             return rowView;
         }

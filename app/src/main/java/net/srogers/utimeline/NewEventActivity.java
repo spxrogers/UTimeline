@@ -293,8 +293,10 @@ public class NewEventActivity extends AppCompatActivity {
         } else {
 
             UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);
-            UTimelineMedia media = new UTimelineMedia(mImageLocation);
-            newEvent.addMedia(media);
+            if (mImageLocation != null) {
+                UTimelineMedia media = new UTimelineMedia(mImageLocation);
+                newEvent.addMedia(media);
+            }
             user.addEvent(newEvent);
         }
 

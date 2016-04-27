@@ -144,11 +144,16 @@ public class DetailViewActivity extends AppCompatActivity {
      */
     public void updateEventImage() {
         List<UTimelineMedia> media = mUTimelineEvent.getMedia();
-        UTimelineMedia eventImage = media.get(0);
-        String location = eventImage.getLocation();
+        UTimelineMedia eventImage = null;
+        String location = null;
+
+        if (media.size() > 0) {
+            eventImage = media.get(0);
+            location = eventImage.getLocation();
+        }
 
         if (location != null && !location.isEmpty()) {
-            mEventImage.setImageURI(Uri.fromFile(new File(eventImage.getLocation())));
+        mEventImage.setImageURI(Uri.fromFile(new File(eventImage.getLocation())));
         } else {
             Log.d(TAG, "Event did not have an image to update.");
         }
