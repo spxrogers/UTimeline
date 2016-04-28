@@ -14,7 +14,10 @@
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
             android:text="@string/add_event_title"
-            android:onClick="selectTitle"/>
+            android:onClick="selectTitle"
+            android:textColor="#CF5300"
+            android:background="@drawable/button_background"
+            android:layout_margin="5dp"/>
 
         <EditText
             android:background="@drawable/description_background"
@@ -26,15 +29,15 @@
             android:layout_width="fill_parent"
             android:minLines="@string/description_input_linenum"
             android:maxLines="@string/description_input_linenum"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="30dp"
+            android:layout_margin="5dp"
             android:scrollbars="vertical"
-            android:hint="@string/description_input_placeholder" />
+            android:hint="@string/description_input_placeholder"
+            android:padding="5dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="5dp"
             android:orientation="horizontal"
             android:weightSum="1">
 
@@ -57,7 +60,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
-                android:text="@string/set_event_date" />
+                android:text="@string/set_event_date"
+                android:textColor="#CF5300"
+                android:background="@drawable/button_background"
+                android:layout_margin="5dp"/>
 
         </LinearLayout>
 
@@ -66,23 +72,16 @@
             android:id="@+id/add_event_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
             android:onClick="selectImage"
             tools:ignore="ContentDescription" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="5dp"
             android:orientation="horizontal"
             android:weightSum="1">
-
-            <Button
-                android:id="@+id/create_event_button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight=".5"
-                android:onClick="saveEvent"
-                android:text="@string/create_event" />
 
             <Button
                 android:id="@+id/cancel_event_button"
@@ -90,7 +89,21 @@
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
                 android:onClick="cancelCreateEvent"
-                android:text="@string/cancel_event" />
+                android:text="@string/cancel_event"
+                android:textColor="#CF5300"
+                android:background="@drawable/button_background"
+                android:layout_margin="5dp"/>
+
+            <Button
+                android:id="@+id/create_event_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:onClick="saveEvent"
+                android:text="@string/create_event"
+                android:textColor="#CF5300"
+                android:background="@drawable/button_background"
+                android:layout_margin="5dp"/>
 
         </LinearLayout>
     </LinearLayout>
