@@ -153,7 +153,7 @@ public class DetailViewActivity extends AppCompatActivity {
         }
 
         if (location != null && !location.isEmpty()) {
-        mEventImage.setImageURI(Uri.fromFile(new File(eventImage.getLocation())));
+            mEventImage.setImageURI(Uri.fromFile(new File(eventImage.getLocation())));
         } else {
             Log.d(TAG, "Event did not have an image to update.");
         }
