@@ -17,13 +17,19 @@
             android:layout_width="match_parent"
             android:layout_weight="1"
             android:text="@string/add_new_button_text"
-            android:onClick="addEvent" />
+            android:onClick="addEvent"
+            android:textColor="#CF5300"
+            android:background="@drawable/button_background"
+            android:layout_margin="5dp"/>
         <Button
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:layout_weight="1"
             android:text="@string/plan_future_button_text"
-            android:onClick="addFutureEvent" />
+            android:onClick="addFutureEvent"
+            android:textColor="#CF5300"
+            android:background="@drawable/button_background"
+            android:layout_margin="5dp"/>
 
     </LinearLayout>
 
