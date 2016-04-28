@@ -10,6 +10,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -38,16 +39,11 @@ public class SelectTitleActivity  extends AppCompatActivity {
                 returnTitle(titles[position]);
             }
         });
+    }
 
-        customTitle.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                // If the event is a key-down event on the "enter" button
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    returnTitle(customTitle.getText().toString());
-                }
-                return false;
-            }
-        });
+    public void submitTitle(View v) {
+        EditText customTitle = (EditText) findViewById(R.id.custom_title);
+        returnTitle(customTitle.getText().toString());
     }
 
     private void returnTitle(String title) {
