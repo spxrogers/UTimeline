@@ -131,9 +131,13 @@ public class NewEventActivity extends AppCompatActivity {
         description.setText(event.getDescription());
 
         ImageView picture = (ImageView) findViewById(R.id.add_event_image);
-        String path = event.getMedia().get(0).getLocation();
-        if(path != null)
+        String path = null;
+        if (event.getMedia().size() > 0)
+            path = event.getMedia().get(0).getLocation();
+        if (path != null) {
             scaleAndSetImage(picture, path);
+            mImageLocation = path;
+        }
     }
 
     private void setDateTextView() {
@@ -183,8 +187,16 @@ public class NewEventActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals("Take Photo")) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, REQUEST_CAMERA);
+                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                    String imageFileName = timeStamp + ".jpg";
+                    File storageDir = Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES);
+                    mImageLocation = storageDir.getAbsolutePath() + "/" + imageFileName;
+                    File file = new File(mImageLocation);
+                    Uri outputFileUri = Uri.fromFile(file);
+                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+                    startActivityForResult(cameraIntent, REQUEST_CAMERA);
                 } else if (items[item].equals("Choose from Library")) {
                     Intent intent = new Intent(
                             Intent.ACTION_PICK,
@@ -205,6 +217,7 @@ public class NewEventActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "In onActivityResult with requestCode " + requestCode + " and resultCode " + resultCode);
+        ImageView ivImage = (ImageView) findViewById(R.id.add_event_image);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case TITLE_REQUEST_CODE :
@@ -213,27 +226,22 @@ public class NewEventActivity extends AppCompatActivity {
                     Log.d(TAG, "Title received: " + data.getStringExtra(TITLE_MESSAGE));
                     break;
                 case REQUEST_CAMERA :
-                    ImageView ivImage = (ImageView) findViewById(R.id.add_event_image);
-                    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-                    File destination = new File(Environment.getExternalStoragePublicDirectory(
-                            Environment.DIRECTORY_PICTURES), System.currentTimeMillis() + ".jpg");
-                    Log.d(TAG, "Photo destination Uri: " + destination.toURI().toString());
-                    Log.d(TAG, "Photo destination path: " + destination.getAbsolutePath());
-                    FileOutputStream fo;
-                    try {
-                        destination.createNewFile();
-                        fo = new FileOutputStream(destination);
-                        fo.write(bytes.toByteArray());
-                        fo.close();
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    File imgFile = new File(mImageLocation);
+                    if (imgFile.exists()) {
+                        Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                        ImageView myImage = (ImageView) findViewById(R.id.add_event_image);
+                        int nh = (int) (myBitmap.getHeight() * (512.0 / myBitmap.getWidth()));
+                        Bitmap scaled = Bitmap.createScaledBitmap(myBitmap, 512, nh, true);
+                        FileOutputStream out = null;
+                        try {
+                            out = new FileOutputStream(imgFile);
+                            scaled.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+                            // PNG is a lossless format, the compression factor (100) is ignored
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        myImage.setImageBitmap(scaled);
                     }
-                    ivImage.setImageBitmap(thumbnail);
-                    mImageLocation = destination.getAbsolutePath();
                     break;
                 case SELECT_FILE :
                     ivImage = (ImageView) findViewById(R.id.add_event_image);
@@ -289,7 +297,8 @@ public class NewEventActivity extends AppCompatActivity {
             event.setTitle(titleText);
             event.setDescription(descriptionText);
             event.setDate(date);
-            event.getMedia().get(0).setLocation(mImageLocation);
+            if (event.getMedia().size() > 0)
+                event.getMedia().get(0).setLocation(mImageLocation);
         } else {
 
             UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);
