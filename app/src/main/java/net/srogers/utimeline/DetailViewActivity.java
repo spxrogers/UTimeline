@@ -4,6 +4,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -153,7 +156,9 @@ public class DetailViewActivity extends AppCompatActivity {
         }
 
         if (location != null && !location.isEmpty()) {
-        mEventImage.setImageURI(Uri.fromFile(new File(eventImage.getLocation())));
+            Bitmap bm = BitmapFactory.decodeFile(eventImage.getLocation());
+            BitmapDrawable bmd = new BitmapDrawable(getResources(), bm);
+            mEventImage.setBackgroundDrawable(bmd);
         } else {
             Log.d(TAG, "Event did not have an image to update.");
         }

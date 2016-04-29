@@ -23,7 +23,6 @@
         </activity>
         <activity
             android:name=".DetailViewActivity"
-            android:label="@string/title_activity_detail_view"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
@@ -44,5 +43,4 @@
             android:screenOrientation="portrait">
         </activity>
     </application>
-
 </manifest>
