@@ -30,14 +30,12 @@ import net.srogers.utimeline.model.UTimelineEvent;
 import net.srogers.utimeline.model.UTimelineMedia;
 import net.srogers.utimeline.model.User;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Activity for creating or editing an event
@@ -308,6 +306,13 @@ public class NewEventActivity extends AppCompatActivity {
             }
             user.addEvent(newEvent);
         }
+
+        // check if exists in future
+        List<String> planned = user.getPlanned();
+        while (planned.contains(titleText)) {
+            planned.remove(titleText);
+        }
+        user.setPlanned(planned);
 
         user.saveUser();
         finish();

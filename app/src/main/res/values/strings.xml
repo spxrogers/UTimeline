@@ -21,5 +21,7 @@
     <string name="plan_future_button_text">Plan Future</string>
     <string name="add_new_button_text">Add New Event</string>
     <string name="view_detail_text"><![CDATA[View Detail >]]></string>
+    <string name="add_future_buttontitle">addFuture</string>
+    <string name="event_titlee">Event Title</string>
 
 </resources>
