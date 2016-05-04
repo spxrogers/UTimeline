@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,25 +20,29 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.srogers.utimeline.model.UTimelineEvent;
 import net.srogers.utimeline.model.UTimelineMedia;
 import net.srogers.utimeline.model.User;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Activity for creating or editing an event
@@ -54,6 +59,7 @@ public class NewEventActivity extends AppCompatActivity {
     private TextView mEventDate;
     private String mImageLocation;
     private int mEvent;
+    private List<UTimelineMedia> mMedia;
 
     private int year;
     private int month;
@@ -88,6 +94,8 @@ public class NewEventActivity extends AppCompatActivity {
         year = c.get(Calendar.YEAR);
         month = c.get(Calendar.MONTH);
         day = c.get(Calendar.DAY_OF_MONTH);
+
+        mMedia = new ArrayList<>();
 
         mEventDate = (TextView) findViewById(R.id.event_date);
         Button setDate = (Button) findViewById(R.id.date_picker);
@@ -130,13 +138,14 @@ public class NewEventActivity extends AppCompatActivity {
         EditText description = (EditText) findViewById(R.id.add_event_description);
         description.setText(event.getDescription());
 
-        ImageView picture = (ImageView) findViewById(R.id.add_event_image);
+        LinearLayout scrollView = (LinearLayout) findViewById(R.id.image_scroller);
         String path = null;
-        if (event.getMedia().size() > 0)
-            path = event.getMedia().get(0).getLocation();
+        mMedia = event.getMedia();
+        if (mMedia.size() > 0)
+            path = mMedia.get(0).getLocation();
         if (path != null) {
-            scaleAndSetImage(picture, path);
-            mImageLocation = path;
+            for(UTimelineMedia media : mMedia)
+                scrollView.addView(insertPhoto(media.getLocation()));
         }
     }
 
@@ -217,7 +226,7 @@ public class NewEventActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "In onActivityResult with requestCode " + requestCode + " and resultCode " + resultCode);
-        ImageView ivImage = (ImageView) findViewById(R.id.add_event_image);
+        LinearLayout scrollView = (LinearLayout) findViewById(R.id.image_scroller);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case TITLE_REQUEST_CODE :
@@ -229,7 +238,6 @@ public class NewEventActivity extends AppCompatActivity {
                     File imgFile = new File(mImageLocation);
                     if (imgFile.exists()) {
                         Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                        ImageView myImage = (ImageView) findViewById(R.id.add_event_image);
                         int nh = (int) (myBitmap.getHeight() * (512.0 / myBitmap.getWidth()));
                         Bitmap scaled = Bitmap.createScaledBitmap(myBitmap, 512, nh, true);
                         FileOutputStream out = null;
@@ -240,11 +248,13 @@ public class NewEventActivity extends AppCompatActivity {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        myImage.setImageBitmap(scaled);
+
+                        //ivImage.setImageBitmap(scaled);
+                        mMedia.add(new UTimelineMedia(mImageLocation));
+                        scrollView.addView(insertPhoto(mImageLocation));
                     }
                     break;
                 case SELECT_FILE :
-                    ivImage = (ImageView) findViewById(R.id.add_event_image);
                     Uri selectedImageUri = data.getData();
                     Log.d(TAG, "Selected image Uri: " + selectedImageUri.toString());
                     String[] projection = {MediaStore.MediaColumns.DATA};
@@ -256,29 +266,66 @@ public class NewEventActivity extends AppCompatActivity {
                     String selectedImagePath = cursor.getString(column_index);
                     Log.d(TAG, "Selected image path: " + selectedImagePath);
 
-                    scaleAndSetImage(ivImage, selectedImagePath);
-
-                    mImageLocation = selectedImagePath;
+                    mMedia.add(new UTimelineMedia(selectedImagePath));
+                    scrollView.addView(insertPhoto(selectedImagePath));
                     break;
             }
         }
     }
 
-    private void scaleAndSetImage(ImageView view, String path) {
-        Bitmap bm;
-        BitmapFactory.Options options = new BitmapFactory.Options();
+    View insertPhoto(String path){
+        Bitmap bm = decodeSampledBitmapFromUri(path, 220, 220);
+
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setLayoutParams(new ViewGroup.LayoutParams(250, 250));
+        layout.setGravity(Gravity.CENTER);
+
+        ImageView imageView = new ImageView(getApplicationContext());
+        imageView.setLayoutParams(new ViewGroup.LayoutParams(220, 220));
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView.setImageBitmap(bm);
+
+        layout.addView(imageView);
+        return layout;
+    }
+
+    public Bitmap decodeSampledBitmapFromUri(String path, int reqWidth, int reqHeight) {
+        Bitmap bm = null;
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path, options);
-        final int REQUIRED_SIZE = 200;
-        int scale = 1;
-        while (options.outWidth / scale / 2 >= REQUIRED_SIZE
-                && options.outHeight / scale / 2 >= REQUIRED_SIZE)
-            scale *= 2;
-        options.inSampleSize = scale;
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         bm = BitmapFactory.decodeFile(path, options);
-        view.setImageBitmap(bm);
+
+        return bm;
     }
+
+    public int calculateInSampleSize(
+
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            if (width > height) {
+                inSampleSize = Math.round((float)height / (float)reqHeight);
+            } else {
+                inSampleSize = Math.round((float)width / (float)reqWidth);
+            }
+        }
+
+        return inSampleSize;
+    }
+
 
     public void saveEvent(View v) {
         Button titleButton = (Button) findViewById(R.id.add_event_title);
@@ -297,15 +344,10 @@ public class NewEventActivity extends AppCompatActivity {
             event.setTitle(titleText);
             event.setDescription(descriptionText);
             event.setDate(date);
-            if (event.getMedia().size() > 0)
-                event.getMedia().get(0).setLocation(mImageLocation);
+            event.setMedia(mMedia);
         } else {
-
             UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);
-            if (mImageLocation != null) {
-                UTimelineMedia media = new UTimelineMedia(mImageLocation);
-                newEvent.addMedia(media);
-            }
+            newEvent.setMedia(mMedia);
             user.addEvent(newEvent);
         }
 

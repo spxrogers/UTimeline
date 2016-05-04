@@ -15,6 +15,8 @@
     <string name="event_detail_title_text">Event Name Here</string>
     <string name="first_event_button">Add First Event</string>
     <string name="set_event_date">Change Date</string>
+    <string name="add_event_photo">"Add Photo"</string>
+    <string name="delete_event_photo">"Delete Photo"</string>
     <string name="title_activity_detail_view">Event Detail View</string>
     <string name="custom_title">Custom Title</string>
     <string name="submit_title">Submit</string>
