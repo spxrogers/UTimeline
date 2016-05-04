@@ -90,6 +90,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
+                android:onClick="deleteImage"
                 android:text="@string/delete_event_photo"
                 android:textColor="#CF5300"
                 android:background="@drawable/button_background"

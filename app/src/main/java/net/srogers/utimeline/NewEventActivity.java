@@ -31,6 +31,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.srogers.utimeline.model.UTimelineEvent;
 import net.srogers.utimeline.model.UTimelineMedia;
@@ -80,22 +81,33 @@ public class NewEventActivity extends AppCompatActivity {
 
         setContentView(R.layout.new_event);
 
+        String futureEvent = getIntent().getStringExtra("future_title");
+        Log.d(TAG, "In onCreate and event title is: " + futureEvent);
+
         mEvent = getIntent().getIntExtra("eventIndex", -1);
         Log.d(TAG, "In onCreate and index is: " + mEvent);
         if (mEvent == -1) {
-            createNewEvent();
+            createNewEvent(futureEvent);
         } else {
             editEvent();
         }
     }
 
-    private void createNewEvent() {
+    private void createNewEvent(String eventTitle) {
         final Calendar c = Calendar.getInstance();
         year = c.get(Calendar.YEAR);
         month = c.get(Calendar.MONTH);
         day = c.get(Calendar.DAY_OF_MONTH);
 
+        if(eventTitle != null) {
+            Button titleButton = (Button) findViewById(R.id.add_event_title);
+            titleButton.setText(eventTitle);
+        }
+
         mMedia = new ArrayList<>();
+
+        Button deletePhoto = (Button) findViewById(R.id.delete_photo_button);
+        deletePhoto.setClickable(false);
 
         mEventDate = (TextView) findViewById(R.id.event_date);
         Button setDate = (Button) findViewById(R.id.date_picker);
@@ -140,12 +152,14 @@ public class NewEventActivity extends AppCompatActivity {
 
         LinearLayout scrollView = (LinearLayout) findViewById(R.id.image_scroller);
         String path = null;
-        mMedia = event.getMedia();
-        if (mMedia.size() > 0)
-            path = mMedia.get(0).getLocation();
+        mMedia = new ArrayList<>();
+        if (event.getMedia().size() > 0)
+            path = event.getMedia().get(0).getLocation();
         if (path != null) {
-            for(UTimelineMedia media : mMedia)
+            for(UTimelineMedia media : event.getMedia()) {
+                mMedia.add(media);
                 scrollView.addView(insertPhoto(media.getLocation()));
+            }
         }
     }
 
@@ -184,6 +198,10 @@ public class NewEventActivity extends AppCompatActivity {
     public void selectTitle(View v) {
         Intent intent = new Intent(this, SelectTitleActivity.class);
         startActivityForResult(intent, TITLE_REQUEST_CODE);
+    }
+
+    public void deleteImage(View v) {
+
     }
 
     public void selectImage(View v) {
@@ -237,7 +255,7 @@ public class NewEventActivity extends AppCompatActivity {
                 case REQUEST_CAMERA :
                     File imgFile = new File(mImageLocation);
                     if (imgFile.exists()) {
-                        Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                        /*Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                         int nh = (int) (myBitmap.getHeight() * (512.0 / myBitmap.getWidth()));
                         Bitmap scaled = Bitmap.createScaledBitmap(myBitmap, 512, nh, true);
                         FileOutputStream out = null;
@@ -247,7 +265,7 @@ public class NewEventActivity extends AppCompatActivity {
                             // PNG is a lossless format, the compression factor (100) is ignored
                         } catch (Exception e) {
                             e.printStackTrace();
-                        }
+                        }*/
 
                         //ivImage.setImageBitmap(scaled);
                         mMedia.add(new UTimelineMedia(mImageLocation));
@@ -308,7 +326,6 @@ public class NewEventActivity extends AppCompatActivity {
     }
 
     public int calculateInSampleSize(
-
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
@@ -331,35 +348,41 @@ public class NewEventActivity extends AppCompatActivity {
         Button titleButton = (Button) findViewById(R.id.add_event_title);
         String titleText = titleButton.getText().toString();
 
-        EditText description = (EditText) findViewById(R.id.add_event_description);
-        String descriptionText = description.getText().toString();
-
-        Calendar c = Calendar.getInstance();
-        c.set(year, month, day);
-        Date date = c.getTime();
-
-        User user = User.getCurrentUser();
-        if (mEvent != -1) {
-            UTimelineEvent event = user.getEvent(mEvent);
-            event.setTitle(titleText);
-            event.setDescription(descriptionText);
-            event.setDate(date);
-            event.setMedia(mMedia);
+        if(titleText.equals(getResources().getText(R.string.add_event_title))) {
+            Toast.makeText(getApplicationContext(), "Event must have a title",
+                    Toast.LENGTH_SHORT).show();
         } else {
-            UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);
-            newEvent.setMedia(mMedia);
-            user.addEvent(newEvent);
-        }
 
-        // check if exists in future
-        List<String> planned = user.getPlanned();
-        while (planned.contains(titleText)) {
-            planned.remove(titleText);
-        }
-        user.setPlanned(planned);
+            EditText description = (EditText) findViewById(R.id.add_event_description);
+            String descriptionText = description.getText().toString();
 
-        user.saveUser();
-        finish();
+            Calendar c = Calendar.getInstance();
+            c.set(year, month, day);
+            Date date = c.getTime();
+
+            User user = User.getCurrentUser();
+            if (mEvent != -1) {
+                UTimelineEvent event = user.getEvent(mEvent);
+                event.setTitle(titleText);
+                event.setDescription(descriptionText);
+                event.setDate(date);
+                event.setMedia(mMedia);
+            } else {
+                UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);
+                newEvent.setMedia(mMedia);
+                user.addEvent(newEvent);
+            }
+
+            // check if exists in future
+            List<String> planned = user.getPlanned();
+            while (planned.contains(titleText)) {
+                planned.remove(titleText);
+            }
+            user.setPlanned(planned);
+
+            user.saveUser();
+            finish();
+        }
     }
 
     public void cancelCreateEvent(View v) {
