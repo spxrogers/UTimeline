@@ -71,7 +71,7 @@ public class NewEventActivity extends AppCompatActivity {
     static final int REQUEST_CAMERA = 1;
     static final int SELECT_FILE = 2;
     static final int TITLE_REQUEST_CODE = 3;
-    static final int DELETE_IMAGE_DIALOG_ID = 4;
+    static final int DELETE_IMAGE_DIALOG_ID = 5;
 
     public static String TITLE_MESSAGE = "title";
 
