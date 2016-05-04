@@ -351,6 +351,13 @@ public class NewEventActivity extends AppCompatActivity {
             user.addEvent(newEvent);
         }
 
+        // check if exists in future
+        List<String> planned = user.getPlanned();
+        while (planned.contains(titleText)) {
+            planned.remove(titleText);
+        }
+        user.setPlanned(planned);
+
         user.saveUser();
         finish();
     }

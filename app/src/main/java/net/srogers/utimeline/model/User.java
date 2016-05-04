@@ -1,5 +1,6 @@
 package net.srogers.utimeline.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,10 +12,12 @@ import io.paperdb.Paper;
 public class User {
     // instance variables
     private Timeline timeline;
+    private List<String> planned;
 
     // constructor / generator
     public User() {
         timeline = new Timeline();
+        planned = new ArrayList<>();
     }
 
     // getters and setters
@@ -24,6 +27,8 @@ public class User {
     public void setTimeline(Timeline timeline) {
         this.timeline = timeline;
     }
+    public List<String> getPlanned() { return planned; }
+    public void setPlanned(List<String> planned) { this.planned = planned; }
 
     public static User getCurrentUser() {
         User user = Paper.book().read("current_user");
