@@ -61,6 +61,7 @@ public class NewEventActivity extends AppCompatActivity {
     private String mImageLocation;
     private int mEvent;
     private List<UTimelineMedia> mMedia;
+    private int mImageIndex;
 
     private int year;
     private int month;
@@ -70,6 +71,7 @@ public class NewEventActivity extends AppCompatActivity {
     static final int REQUEST_CAMERA = 1;
     static final int SELECT_FILE = 2;
     static final int TITLE_REQUEST_CODE = 3;
+    static final int DELETE_IMAGE_DIALOG_ID = 4;
 
     public static String TITLE_MESSAGE = "title";
 
@@ -105,9 +107,6 @@ public class NewEventActivity extends AppCompatActivity {
         }
 
         mMedia = new ArrayList<>();
-
-        Button deletePhoto = (Button) findViewById(R.id.delete_photo_button);
-        deletePhoto.setClickable(false);
 
         mEventDate = (TextView) findViewById(R.id.event_date);
         Button setDate = (Button) findViewById(R.id.date_picker);
@@ -156,11 +155,12 @@ public class NewEventActivity extends AppCompatActivity {
         if (event.getMedia().size() > 0)
             path = event.getMedia().get(0).getLocation();
         if (path != null) {
-            for(UTimelineMedia media : event.getMedia()) {
+            for (UTimelineMedia media : event.getMedia()) {
                 mMedia.add(media);
                 scrollView.addView(insertPhoto(media.getLocation()));
             }
         }
+
     }
 
     private void setDateTextView() {
@@ -191,6 +191,35 @@ public class NewEventActivity extends AppCompatActivity {
                         setDateTextView();
                     }
                 }, year, month, day);
+            case DELETE_IMAGE_DIALOG_ID:
+                android.app.AlertDialog.Builder deleteEventDialogBuilder = new android.app.AlertDialog.Builder(NewEventActivity.this);
+                deleteEventDialogBuilder.setMessage("Are you sure you want to delete this image?");
+                deleteEventDialogBuilder.setCancelable(true);
+
+                deleteEventDialogBuilder.setPositiveButton(
+                        "Yes",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                mMedia.remove(mImageIndex);
+                                LinearLayout scrollView = (LinearLayout) findViewById(R.id.image_scroller);
+                                try {
+                                    scrollView.removeViewAt(mImageIndex);
+                                } catch (NullPointerException e) {
+                                    Log.d(TAG, "No image at index: " + mImageIndex);
+                                }
+                            }
+                        });
+
+                deleteEventDialogBuilder.setNegativeButton(
+                        "No",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                android.app.AlertDialog deleteEventAlert = deleteEventDialogBuilder.create();
+                deleteEventAlert.show();
         }
         return null;
     }
@@ -198,10 +227,6 @@ public class NewEventActivity extends AppCompatActivity {
     public void selectTitle(View v) {
         Intent intent = new Intent(this, SelectTitleActivity.class);
         startActivityForResult(intent, TITLE_REQUEST_CODE);
-    }
-
-    public void deleteImage(View v) {
-
     }
 
     public void selectImage(View v) {
@@ -304,7 +329,16 @@ public class NewEventActivity extends AppCompatActivity {
         imageView.setImageBitmap(bm);
 
         layout.addView(imageView);
+        layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout scrollView = (LinearLayout) findViewById(R.id.image_scroller);
+                mImageIndex = scrollView.indexOfChild(v);
+                showDialog(DELETE_IMAGE_DIALOG_ID);
+            }
+        });
         return layout;
+
     }
 
     public Bitmap decodeSampledBitmapFromUri(String path, int reqWidth, int reqHeight) {
