@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,12 +20,18 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.srogers.utimeline.model.UTimelineEvent;
 import net.srogers.utimeline.model.UTimelineMedia;
@@ -33,6 +40,7 @@ import net.srogers.utimeline.model.User;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -52,6 +60,8 @@ public class NewEventActivity extends AppCompatActivity {
     private TextView mEventDate;
     private String mImageLocation;
     private int mEvent;
+    private List<UTimelineMedia> mMedia;
+    private int mImageIndex;
 
     private int year;
     private int month;
@@ -61,6 +71,7 @@ public class NewEventActivity extends AppCompatActivity {
     static final int REQUEST_CAMERA = 1;
     static final int SELECT_FILE = 2;
     static final int TITLE_REQUEST_CODE = 3;
+    static final int DELETE_IMAGE_DIALOG_ID = 5;
 
     public static String TITLE_MESSAGE = "title";
 
@@ -72,20 +83,30 @@ public class NewEventActivity extends AppCompatActivity {
 
         setContentView(R.layout.new_event);
 
+        String futureEvent = getIntent().getStringExtra("future_title");
+        Log.d(TAG, "In onCreate and event title is: " + futureEvent);
+
         mEvent = getIntent().getIntExtra("eventIndex", -1);
         Log.d(TAG, "In onCreate and index is: " + mEvent);
         if (mEvent == -1) {
-            createNewEvent();
+            createNewEvent(futureEvent);
         } else {
             editEvent();
         }
     }
 
-    private void createNewEvent() {
+    private void createNewEvent(String eventTitle) {
         final Calendar c = Calendar.getInstance();
         year = c.get(Calendar.YEAR);
         month = c.get(Calendar.MONTH);
         day = c.get(Calendar.DAY_OF_MONTH);
+
+        if(eventTitle != null) {
+            Button titleButton = (Button) findViewById(R.id.add_event_title);
+            titleButton.setText(eventTitle);
+        }
+
+        mMedia = new ArrayList<>();
 
         mEventDate = (TextView) findViewById(R.id.event_date);
         Button setDate = (Button) findViewById(R.id.date_picker);
@@ -128,14 +149,18 @@ public class NewEventActivity extends AppCompatActivity {
         EditText description = (EditText) findViewById(R.id.add_event_description);
         description.setText(event.getDescription());
 
-        ImageView picture = (ImageView) findViewById(R.id.add_event_image);
+        LinearLayout scrollView = (LinearLayout) findViewById(R.id.image_scroller);
         String path = null;
+        mMedia = new ArrayList<>();
         if (event.getMedia().size() > 0)
             path = event.getMedia().get(0).getLocation();
         if (path != null) {
-            scaleAndSetImage(picture, path);
-            mImageLocation = path;
+            for (UTimelineMedia media : event.getMedia()) {
+                mMedia.add(media);
+                scrollView.addView(insertPhoto(media.getLocation()));
+            }
         }
+
     }
 
     private void setDateTextView() {
@@ -166,6 +191,35 @@ public class NewEventActivity extends AppCompatActivity {
                         setDateTextView();
                     }
                 }, year, month, day);
+            case DELETE_IMAGE_DIALOG_ID:
+                android.app.AlertDialog.Builder deleteEventDialogBuilder = new android.app.AlertDialog.Builder(NewEventActivity.this);
+                deleteEventDialogBuilder.setMessage("Are you sure you want to delete this image?");
+                deleteEventDialogBuilder.setCancelable(true);
+
+                deleteEventDialogBuilder.setPositiveButton(
+                        "Yes",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                mMedia.remove(mImageIndex);
+                                LinearLayout scrollView = (LinearLayout) findViewById(R.id.image_scroller);
+                                try {
+                                    scrollView.removeViewAt(mImageIndex);
+                                } catch (NullPointerException e) {
+                                    Log.d(TAG, "No image at index: " + mImageIndex);
+                                }
+                            }
+                        });
+
+                deleteEventDialogBuilder.setNegativeButton(
+                        "No",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                android.app.AlertDialog deleteEventAlert = deleteEventDialogBuilder.create();
+                deleteEventAlert.show();
         }
         return null;
     }
@@ -215,7 +269,7 @@ public class NewEventActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "In onActivityResult with requestCode " + requestCode + " and resultCode " + resultCode);
-        ImageView ivImage = (ImageView) findViewById(R.id.add_event_image);
+        LinearLayout scrollView = (LinearLayout) findViewById(R.id.image_scroller);
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case TITLE_REQUEST_CODE :
@@ -226,8 +280,7 @@ public class NewEventActivity extends AppCompatActivity {
                 case REQUEST_CAMERA :
                     File imgFile = new File(mImageLocation);
                     if (imgFile.exists()) {
-                        Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                        ImageView myImage = (ImageView) findViewById(R.id.add_event_image);
+                        /*Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                         int nh = (int) (myBitmap.getHeight() * (512.0 / myBitmap.getWidth()));
                         Bitmap scaled = Bitmap.createScaledBitmap(myBitmap, 512, nh, true);
                         FileOutputStream out = null;
@@ -237,12 +290,14 @@ public class NewEventActivity extends AppCompatActivity {
                             // PNG is a lossless format, the compression factor (100) is ignored
                         } catch (Exception e) {
                             e.printStackTrace();
-                        }
-                        myImage.setImageBitmap(scaled);
+                        }*/
+
+                        //ivImage.setImageBitmap(scaled);
+                        mMedia.add(new UTimelineMedia(mImageLocation));
+                        scrollView.addView(insertPhoto(mImageLocation));
                     }
                     break;
                 case SELECT_FILE :
-                    ivImage = (ImageView) findViewById(R.id.add_event_image);
                     Uri selectedImageUri = data.getData();
                     Log.d(TAG, "Selected image Uri: " + selectedImageUri.toString());
                     String[] projection = {MediaStore.MediaColumns.DATA};
@@ -254,68 +309,114 @@ public class NewEventActivity extends AppCompatActivity {
                     String selectedImagePath = cursor.getString(column_index);
                     Log.d(TAG, "Selected image path: " + selectedImagePath);
 
-                    scaleAndSetImage(ivImage, selectedImagePath);
-
-                    mImageLocation = selectedImagePath;
+                    mMedia.add(new UTimelineMedia(selectedImagePath));
+                    scrollView.addView(insertPhoto(selectedImagePath));
                     break;
             }
         }
     }
 
-    private void scaleAndSetImage(ImageView view, String path) {
-        Bitmap bm;
-        BitmapFactory.Options options = new BitmapFactory.Options();
+    View insertPhoto(String path){
+        Bitmap bm = decodeSampledBitmapFromUri(path, 220, 220);
+
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setLayoutParams(new ViewGroup.LayoutParams(250, 250));
+        layout.setGravity(Gravity.CENTER);
+
+        ImageView imageView = new ImageView(getApplicationContext());
+        imageView.setLayoutParams(new ViewGroup.LayoutParams(220, 220));
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView.setImageBitmap(bm);
+
+        layout.addView(imageView);
+        layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LinearLayout scrollView = (LinearLayout) findViewById(R.id.image_scroller);
+                mImageIndex = scrollView.indexOfChild(v);
+                showDialog(DELETE_IMAGE_DIALOG_ID);
+            }
+        });
+        return layout;
+
+    }
+
+    public Bitmap decodeSampledBitmapFromUri(String path, int reqWidth, int reqHeight) {
+        Bitmap bm = null;
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path, options);
-        final int REQUIRED_SIZE = 200;
-        int scale = 1;
-        while (options.outWidth / scale / 2 >= REQUIRED_SIZE
-                && options.outHeight / scale / 2 >= REQUIRED_SIZE)
-            scale *= 2;
-        options.inSampleSize = scale;
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         bm = BitmapFactory.decodeFile(path, options);
-        view.setImageBitmap(bm);
+
+        return bm;
     }
+
+    public int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            if (width > height) {
+                inSampleSize = Math.round((float)height / (float)reqHeight);
+            } else {
+                inSampleSize = Math.round((float)width / (float)reqWidth);
+            }
+        }
+
+        return inSampleSize;
+    }
+
 
     public void saveEvent(View v) {
         Button titleButton = (Button) findViewById(R.id.add_event_title);
         String titleText = titleButton.getText().toString();
 
-        EditText description = (EditText) findViewById(R.id.add_event_description);
-        String descriptionText = description.getText().toString();
-
-        Calendar c = Calendar.getInstance();
-        c.set(year, month, day);
-        Date date = c.getTime();
-
-        User user = User.getCurrentUser();
-        if (mEvent != -1) {
-            UTimelineEvent event = user.getEvent(mEvent);
-            event.setTitle(titleText);
-            event.setDescription(descriptionText);
-            event.setDate(date);
-            if (event.getMedia().size() > 0)
-                event.getMedia().get(0).setLocation(mImageLocation);
+        if(titleText.equals(getResources().getText(R.string.add_event_title))) {
+            Toast.makeText(getApplicationContext(), "Event must have a title",
+                    Toast.LENGTH_SHORT).show();
         } else {
 
-            UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);
-            if (mImageLocation != null) {
-                UTimelineMedia media = new UTimelineMedia(mImageLocation);
-                newEvent.addMedia(media);
+            EditText description = (EditText) findViewById(R.id.add_event_description);
+            String descriptionText = description.getText().toString();
+
+            Calendar c = Calendar.getInstance();
+            c.set(year, month, day);
+            Date date = c.getTime();
+
+            User user = User.getCurrentUser();
+            if (mEvent != -1) {
+                UTimelineEvent event = user.getEvent(mEvent);
+                event.setTitle(titleText);
+                event.setDescription(descriptionText);
+                event.setDate(date);
+                event.setMedia(mMedia);
+            } else {
+                UTimelineEvent newEvent = new UTimelineEvent(titleText, descriptionText, date);
+                newEvent.setMedia(mMedia);
+                user.addEvent(newEvent);
             }
-            user.addEvent(newEvent);
-        }
 
-        // check if exists in future
-        List<String> planned = user.getPlanned();
-        while (planned.contains(titleText)) {
-            planned.remove(titleText);
-        }
-        user.setPlanned(planned);
+            // check if exists in future
+            List<String> planned = user.getPlanned();
+            while (planned.contains(titleText)) {
+                planned.remove(titleText);
+            }
+            user.setPlanned(planned);
 
-        user.saveUser();
-        finish();
+            user.saveUser();
+            finish();
+        }
     }
 
     public void cancelCreateEvent(View v) {

@@ -6,14 +6,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.srogers.utimeline.model.Timeline;
@@ -108,6 +112,13 @@ public class DetailViewActivity extends AppCompatActivity {
                 showDialog(DELETE_DIALOG_ID);
             }
         });
+
+        LinearLayout scrollView = (LinearLayout) findViewById(R.id.image_scroller);
+        if (mUTimelineEvent.getMedia() != null && mUTimelineEvent.getMedia().size() > 0) {
+            for (UTimelineMedia media : mUTimelineEvent.getMedia()) {
+                scrollView.addView(insertPhoto(media.getLocation()));
+            }
+        }
     }
 
     @Override
@@ -160,6 +171,7 @@ public class DetailViewActivity extends AppCompatActivity {
             BitmapDrawable bmd = new BitmapDrawable(getResources(), bm);
             mEventImage.setBackgroundDrawable(bmd);
         } else {
+            mEventImage.setImageResource(R.drawable.uttower);
             Log.d(TAG, "Event did not have an image to update.");
         }
     }
@@ -184,9 +196,10 @@ public class DetailViewActivity extends AppCompatActivity {
      * Updates the event description of the event detail page based on current event
      */
     public void updateEventDescription() {
-        if (mUTimelineEvent.getDescription() != null) {
+        if (!mUTimelineEvent.getDescription().isEmpty()) {
             mEventDescription.setText(mUTimelineEvent.getDescription());
         } else {
+            mEventDescription.setVisibility(View.GONE);
             Log.d(TAG, "Event did not have description to update.");
         }
     }
@@ -201,5 +214,58 @@ public class DetailViewActivity extends AppCompatActivity {
         } else {
             Log.d(TAG, "Event did not have date to update.");
         }
+    }
+
+    View insertPhoto(String path){
+        Bitmap bm = decodeSampledBitmapFromUri(path, 220, 220);
+
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setLayoutParams(new ViewGroup.LayoutParams(250, 250));
+        layout.setGravity(Gravity.CENTER);
+
+        ImageView imageView = new ImageView(getApplicationContext());
+        imageView.setLayoutParams(new ViewGroup.LayoutParams(220, 220));
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView.setImageBitmap(bm);
+
+        layout.addView(imageView);
+        return layout;
+
+    }
+
+    public Bitmap decodeSampledBitmapFromUri(String path, int reqWidth, int reqHeight) {
+        Bitmap bm = null;
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        bm = BitmapFactory.decodeFile(path, options);
+
+        return bm;
+    }
+
+    public int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            if (width > height) {
+                inSampleSize = Math.round((float)height / (float)reqHeight);
+            } else {
+                inSampleSize = Math.round((float)width / (float)reqWidth);
+            }
+        }
+
+        return inSampleSize;
     }
 }
